@@ -1,0 +1,19 @@
+.grid-cell{
+	border:1px solid gray;
+	float:left;
+	width:30px;
+	height:30px;
+}
+
+.brick{
+	background-color:#222;
+}
+.lawn{
+	background-color:#97D791;
+}
+
+.fixfloat{
+	clear: both;
+	height:0px;
+	width:100%;
+}
