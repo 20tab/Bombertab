@@ -1,8 +1,8 @@
 .grid-cell{
 	border:1px solid gray;
 	float:left;
-	width:30px;
-	height:30px;
+	width:70px;
+	height:70px;
 }
 
 .brick{
@@ -16,4 +16,9 @@
 	clear: both;
 	height:0px;
 	width:100%;
+}
+#king{
+	width: 60px;
+	height:80px;
+	background:url('../img/er_king.png');
 }
