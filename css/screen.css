@@ -1,24 +1,19 @@
 .grid-cell{
-	border:1px solid gray;
+	border:0px solid gray;
 	float:left;
-	width:70px;
-	height:70px;
+	width:50px;
+	height:50px;
 }
 
 .brick{
-	background-color:#222;
+	background:url('../img/wall.png') no-repeat top left;
 }
 .lawn{
-	background-color:#97D791;
+	background:url('../img/grass.png') no-repeat top left;
 }
 
 .fixfloat{
 	clear: both;
 	height:0px;
 	width:100%;
-}
-#king{
-	width: 60px;
-	height:80px;
-	background:url('../img/er_king.png');
 }
