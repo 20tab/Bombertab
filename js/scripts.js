@@ -8,7 +8,7 @@ jQuery(function(){
 	var PG_H = (CELL_H+BORDER_CELL*2)*CELLS_NUMBER;
 	var ACTOR_W = 50;
 	var ACTOR_H = 70;
-	var RATE = 30;
+	var RATE = 60;
 	
 	var player_id = 0;
 	var events = Array();
@@ -63,6 +63,7 @@ jQuery(function(){
         }
 
 	
+/*
 		$(document).keydown(function(e){
           switch(e.keyCode){
             case 65: //this is left! (a)
@@ -96,6 +97,7 @@ jQuery(function(){
               break;
           }
         });
+*/
 		
         $.playground().registerCallback(eventsManager, RATE);
         
@@ -112,8 +114,12 @@ jQuery(function(){
 	
 	
 	
+ 	var lock = 0;
 	
 	function eventsManager(){
+
+		if (lock) return;
+		lock = 1;
 	
 		//$("#player")[0].player.update();
 		if(jQuery.gameQuery.keyTracker[65]){ //this is left! (a)
@@ -152,6 +158,7 @@ jQuery(function(){
 			$("#player_"+e[0]).css("left", ""+e[1]+"px");
 			$("#player_"+e[0]).css("top", ""+e[2]+"px");
 		}
+		lock = 0;
 	}
 	
 	
