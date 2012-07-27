@@ -51,7 +51,7 @@ jQuery(function(){
 	    playerAnimation["right"]      = new $.gameQuery.Animation({
         	imageURL: "img/er_king_right.png", 
         	numberOfFrame: 2, 
-        	delta: 14, 
+        	delta: 50, 
         	rate: 20, 
         	type: $.gameQuery.ANIMATION_HORIZONTAL});
 		
