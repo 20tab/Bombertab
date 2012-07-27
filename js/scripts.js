@@ -177,7 +177,7 @@ jQuery(function(){
 	$('#startGame').on('click',function(){
 		$.playground().startGame(function(){
 			
-			ws = new WebSocket("ws://quantal64.local:8080/bombertab");
+			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
 			ws.onopen = function() {
 			        ws.send('{"c":"j"}');
 			};
