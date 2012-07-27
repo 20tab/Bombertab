@@ -189,7 +189,7 @@ jQuery(function(){
 			ws.onmessage = function(evt) { 
 			    var msg = jQuery.parseJSON(evt.data);
 				switch(msg['c']){
-					case "z":
+				    case "z":
 				        player_id = msg['p'];
 				        init_arena(player_id,msg['x'],msg['y'],msg['e']);
 				        $("#grid").html(arena(msg['a']));
@@ -201,11 +201,17 @@ jQuery(function(){
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 			                      width: ACTOR_W, height: ACTOR_H})
 			                  .addSprite("playerBody_"+msg['p'],{animation: playerAnimation["idle"],
-		                      posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-		                //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
-		                break;
-		            case "k":
-		            	$("#player_"+msg['p']).remove();
+		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
+		                         break;
+		                    case "k":
+		            	        $("#player_"+msg['p']).remove();
+		            	        break;
+		            	    case "b":
+		            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+			                      width: ACTOR_W, height: ACTOR_H})
+			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["idle"],
+		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 				    default:
 				    	break;
 				}
