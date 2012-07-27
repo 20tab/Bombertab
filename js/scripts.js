@@ -47,6 +47,8 @@ jQuery(function(){
 	    playerAnimation["down"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png"});
 	    playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
 	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
+	    
+	    playerAnimation["bomb"] =	new $.gameQuery.Animation({imageURL: "img/bomb.png"});
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
@@ -210,7 +212,7 @@ jQuery(function(){
 		            	    case "b":
 		            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 			                      width: ACTOR_W, height: ACTOR_H})
-			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["idle"],
+			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["bomb"],
 		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 				    default:
 				    	break;
