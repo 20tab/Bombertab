@@ -216,6 +216,7 @@ jQuery(function(){
 		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 		                    case "x":
 		            	    	$("#bomb_"+msg['p']).remove();
+		            	    	break;
 				    default:
 				    	break;
 				}
