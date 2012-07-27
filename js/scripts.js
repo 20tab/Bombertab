@@ -9,6 +9,10 @@ jQuery(function(){
 	var PG_H = (CELL_H+BORDER_CELL*2)*CELLS_NUMBER_H;
 	var ACTOR_W = 50;
 	var ACTOR_H = 70;
+	var BOMB_W = 50;
+	var BOMB_H = 50;
+	var EXPLOSION_W = 150;
+	var EXPLOSION_H = 150;
 	var RATE = 60;
 	
 	var player_id = 0;
@@ -49,6 +53,7 @@ jQuery(function(){
 	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
 	    
 	    playerAnimation["bomb"] =	new $.gameQuery.Animation({imageURL: "img/bomb.png"});
+	    playerAnimation["explosion"] = new $.gameQuery.Animation({imageURL: "img/explosion.png"});
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
@@ -211,12 +216,16 @@ jQuery(function(){
 		            	        break;
 		            	    case "b":
 		            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-			                      width: ACTOR_W, height: ACTOR_H})
+			                      width: BOMB_W, height: BOMB_H})
 			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["bomb"],
-		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+		                              posx: 0, posy: 0, width: BOMB_W, height: BOMB_H});
 		                         break;
 		                    case "x":
 		            	    	$("#bomb_"+msg['p']).remove();
+		            	    	$.playground().addGroup("explosion_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+			                      width: EXPLOSION_W, height: EXPLOSION_H})
+			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["explosion"],
+		                              posx: 0, posy: 0, width: EXPLOSION_W, height: EXPLOSION_H});
 		            	    	break;
 				    default:
 				    	break;
