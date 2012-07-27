@@ -214,6 +214,8 @@ jQuery(function(){
 			                      width: ACTOR_W, height: ACTOR_H})
 			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["bomb"],
 		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+		                    case "x":
+		            	    	$.("bomb_"+msg['p'].remove();
 				    default:
 				    	break;
 				}
