@@ -1,11 +1,12 @@
 jQuery(function(){
 	
 	var BORDER_CELL = 0;
-	var CELLS_NUMBER = 13;
+	var CELLS_NUMBER_W = 19;
+	var CELLS_NUMBER_H = 11;
 	var CELL_W = 50;
 	var CELL_H = CELL_W;
-	var PG_W = (CELL_W+BORDER_CELL*2)*CELLS_NUMBER;
-	var PG_H = (CELL_H+BORDER_CELL*2)*CELLS_NUMBER;
+	var PG_W = (CELL_W+BORDER_CELL*2)*CELLS_NUMBER_W;
+	var PG_H = (CELL_H+BORDER_CELL*2)*CELLS_NUMBER_H;
 	var ACTOR_W = 50;
 	var ACTOR_H = 70;
 	var RATE = 60;
@@ -20,7 +21,7 @@ jQuery(function(){
 		while( i < grid.length){
 			html_grid += '<div class="grid-row">'; 
 			var j = 0;
-			while(j < CELLS_NUMBER){
+			while(j < CELLS_NUMBER_W){
 				var type = "brick";
 				if(!grid[pos]){
 					type = "lawn";
