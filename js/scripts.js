@@ -147,7 +147,7 @@ jQuery(function(){
 				$("#player").css("top", ""+nextpos+"px");
 			}*/
 		}
-		else if(jQuery.gameQuery.keyTracker[20]){ //this is bomb! (space)
+		else if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space)
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
 		}
