@@ -147,6 +147,10 @@ jQuery(function(){
 				$("#player").css("top", ""+nextpos+"px");
 			}*/
 		}
+		else if(jQuery.gameQuery.keyTracker[20]){ //this is bomb! (space)
+			var message = {'c':'b','p':player_id};
+			ws.send(JSON.stringify(message));
+		}
 		else if(jQuery.gameQuery.keyTracker[83]){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
