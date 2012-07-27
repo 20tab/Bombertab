@@ -45,11 +45,21 @@ jQuery(function(){
 		
 		$.playground().addSprite('grid',{height: PG_H, width: PG_W}).end();
 		
-		playerAnimation["idle"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png",
-																type: $.gameQuery.ANIMATION_HORIZONTAL});
+		playerAnimation["idle"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png",type: $.gameQuery.ANIMATION_HORIZONTAL});
+		
+		
+	    playerAnimation["right"]      = new $.gameQuery.Animation({
+        	imageURL: "img/er_king_right.png", 
+        	numberOfFrame: 2, 
+        	delta: 14, 
+        	rate: 20, 
+        	type: $.gameQuery.ANIMATION_HORIZONTAL});
+		
+		
+		
 	    playerAnimation["up"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_bl.png"});
 	    playerAnimation["down"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png"});
-	    playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
+	    //playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
 	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
 	    
 	    playerAnimation["bomb"] =	new $.gameQuery.Animation({imageURL: "img/bomb.png"});
