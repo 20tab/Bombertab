@@ -213,6 +213,7 @@ jQuery(function(){
 				        break;
 				    case "m":
 				    	events.push([msg['p'],msg['x'],msg['y']]);
+				    	$("#player_"+msg['p']).setAnimation(playerAnimation["right"]);
 				    	break;
 				    case "p":
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
