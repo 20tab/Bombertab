@@ -43,79 +43,34 @@ jQuery(function(){
 	$('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
 	function init_arena(player_id,pos_x,pos_y,enemies){
 		
+		// inizializzo la griglia con la sprite  da usare
 		$.playground().addSprite('grid',{height: PG_H, width: PG_W}).end();
 		
+		// imposto le animazioni da usare
 		playerAnimation["idle"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png",type: $.gameQuery.ANIMATION_HORIZONTAL});
-		
-		
+	    //playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
 	    playerAnimation["right"]      = new $.gameQuery.Animation({
-        	imageURL: "img/er_king_right.png", 
-        	numberOfFrame: 2, 
-        	delta: 50, 
-        	rate: 20, 
-        	type: $.gameQuery.ANIMATION_HORIZONTAL});
-		
-		
-		
+        	imageURL: "img/er_king_right.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL});
+	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
 	    playerAnimation["up"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_bl.png"});
 	    playerAnimation["down"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png"});
-	    //playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
-	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
-	    
 	    playerAnimation["bomb"] =	new $.gameQuery.Animation({imageURL: "img/bomb.png"});
 	    playerAnimation["explosion"] = new $.gameQuery.Animation({imageURL: "img/explosion.png"});
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
                       width: ACTOR_W, height: ACTOR_H})
-                  .addSprite("playerBody_"+player_id,{animation: playerAnimation["idle"],
+                .addSprite("playerBody_"+player_id,{animation: playerAnimation["idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-        //$("#player_"+player_id).html($("#player_"+player_id).html()+"<span>"+player_id+"</span>");
+
         
+        // aggiungo i nemici
         for(i in enemies){
         	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][1], posy: enemies[i][2],
                       width: ACTOR_W, height: ACTOR_H})
                   .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation["idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-           //$("#player_"+enemies[i][0]).html($("#player_"+enemies[i][0]).html()+enemies[i][0]);  
         }
-
-	
-/*
-		$(document).keydown(function(e){
-          switch(e.keyCode){
-            case 65: //this is left! (a)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["left"]);
-              break;
-            case 87: //this is up! (w)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["up"]);
-              break;
-            case 68: //this is right (d)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["right"]);
-              break;
-                case 83: //this is down! (s)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["down"]);
-              break;
-          }
-        });
-        //this is where the keybinding occurs
-        $(document).keyup(function(e){
-          switch(e.keyCode){
-            case 65: //this is left! (a)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["left"]);
-              break;
-            case 87: //this is up! (w)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["up"]);
-              break;
-            case 68: //this is right (d)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["right"]);
-              break;
-            case 83: //this is down! (s)
-              $("#playerBody_"+player_id).setAnimation(playerAnimation["down"]);
-              break;
-          }
-        });
-*/
 		
         $.playground().registerCallback(eventsManager, RATE);
         
@@ -127,117 +82,116 @@ jQuery(function(){
 	
 	var ws;
 	
-
-	
 	
 	
 	
  	var lock = 0;
+ 	
+ 	send_stop = true;
 	
 	function eventsManager(){
 
 		if (lock) return;
 		lock = 1;
 	
-		//$("#player")[0].player.update();
 		if(jQuery.gameQuery.keyTracker[65]){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
-			/*var nextpos = parseInt($("#player").css("left"))-5;
-			if(nextpos > 0){
-				$("#player").css("left", ""+nextpos+"px");
-    		}*/
+			send_stop = true;
     	}
     	else if(jQuery.gameQuery.keyTracker[68]){ //this is right! (d)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
-			/*var nextpos = parseInt($("#player").css("left"))+5;
-			if(nextpos < PG_W - ACTOR_W){
-				$("#player").css("left", ""+nextpos+"px");
-			}*/
+			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[87]){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
-			/*var nextpos = parseInt($("#player").css("top"))-3;
-			if(nextpos > -30){
-				$("#player").css("top", ""+nextpos+"px");
-			}*/
-		}
-		else if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space)
-			var message = {'c':'b','p':player_id};
-			ws.send(JSON.stringify(message));
+			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[83]){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
-			/*var nextpos = parseInt($("#player").css("top"))+3;
-			if(nextpos < PG_H - ACTOR_H){
-			  	$("#player").css("top", ""+nextpos+"px");
-			}*/
+			send_stop = true;
 		}
-		while((e = events.pop()) != null){
+		else if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space)
+			var message = {'c':'b','p':player_id};
+			ws.send(JSON.stringify(message));
+			send_stop = true;
+		}
+		else if(send_stop){
+		    var message = {'c':'0','p':player_id};
+		    ws.send(JSON.stringify(message));
+		    send_stop = false;
+		}
+		
+		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino
+		    switch(e[3]){ //controllo la direzione
+		        case "n": //north
+                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["up"]);
+		            break;
+		        case "s": //south
+                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["down"]);
+		            break;
+		        case "w": //west
+                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["left"]);
+		            break;
+		        case "e": //east
+                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["right"]);
+		            break;
+		    }
 			$("#player_"+e[0]).css("left", ""+e[1]+"px");
 			$("#player_"+e[0]).css("top", ""+e[2]+"px");
 		}
 		lock = 0;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	$('#startGame').on('click',function(){
 		$.playground().startGame(function(){
 			
 			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
 			ws.onopen = function() {
-			        ws.send('{"c":"j"}');
+			        ws.send('{"c":"j"}');   //c=comando  j=join (chiedo al server di entrare)
 			};
-			ws.onmessage = function(evt) { 
+			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
 			    var msg = jQuery.parseJSON(evt.data);
-				switch(msg['c']){
-				    case "z":
+				switch(msg['c']){  // controllo quale comando viene passato
+				    case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, a=lista di blocchi dell'arena) 
 				        player_id = msg['p'];
 				        init_arena(player_id,msg['x'],msg['y'],msg['e']);
 				        $("#grid").html(arena(msg['a']));
 				        break;
-				    case "m":
-				    	events.push([msg['p'],msg['x'],msg['y']]);
-				    	$("#player_"+msg['p']).setAnimation(playerAnimation["right"]);
+				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
+				    	events.push([msg['p'],msg['x'],msg['y'],msg['d']]);
 				    	break;
-				    case "p":
+				    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-			                      width: ACTOR_W, height: ACTOR_H})
-			                  .addSprite("playerBody_"+msg['p'],{animation: playerAnimation["idle"],
-		                              posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+			                                width: ACTOR_W, height: ACTOR_H})
+			                          .addSprite("playerBody_"+msg['p'],{animation: playerAnimation["idle"],
+		                                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
-		                    case "k":
-		            	        $("#player_"+msg['p']).remove();
-		            	        break;
-		            	    case "b":
-		            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-			                      width: BOMB_W, height: BOMB_H})
-			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["bomb"],
-		                              posx: 0, posy: 0, width: BOMB_W, height: BOMB_H});
-		                         break;
-		                    case "x":
-		            	    	$("#bomb_"+msg['p']).remove();
-		            	    	$.playground().addGroup("explosion_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-			                      width: EXPLOSION_W, height: EXPLOSION_H})
-			                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["explosion"],
-		                              posx: 0, posy: 0, width: EXPLOSION_W, height: EXPLOSION_H});
-		            	    	break;
+                    case "k": // k=kill (rimuovi player_id 'p')
+            	        $("#player_"+msg['p']).remove();
+            	        break;
+            	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
+            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+	                      width: BOMB_W, height: BOMB_H})
+	                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["bomb"],
+                              posx: 0, posy: 0, width: BOMB_W, height: BOMB_H});
+                         break;
+                    case "x": // x=explosion (eplode la bomba)
+            	    	$("#bomb_"+msg['p']).remove();
+            	    	$.playground().addGroup("explosion_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+	                      width: EXPLOSION_W, height: EXPLOSION_H})
+	                  .addSprite("bombBody_"+msg['p'],{animation: playerAnimation["explosion"],
+                              posx: 0, posy: 0, width: EXPLOSION_W, height: EXPLOSION_H});
+            	    	break;
+            	    case "0": // 0=stop (omino p fermo in x y con direzione d)
+            	    	//$("#player_"+msg['p']).setAnimation(playerAnimation["idle"]);
+            	    	break;
 				    default:
 				    	break;
 				}
