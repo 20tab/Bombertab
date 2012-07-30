@@ -177,7 +177,7 @@ jQuery(function(){
 				        $("#grid").html(arena(msg['a']));
 				        break;
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				    	events.push([msg['p'],msg['x'],msg['y'],msg['d']]);
+				    	events.push([msg['p'],msg['x'],msg['y'],msg['d'],msg['o']]);
 				    	break;
 				    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
