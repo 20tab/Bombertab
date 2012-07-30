@@ -135,7 +135,8 @@ jQuery(function(){
 		}
 		
 		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
-            if(e[3]!=e[4]){   //se cambio direzione rispetto al frame precedente
+            if(e[3] != $("#playerBody_"+e[0]).data('direction')){   //se cambio direzione rispetto al frame precedente
+                $("#playerBody_"+e[0]).data('direction', e[3]);
                 switch(e[3]){ //controllo la direzione nuova e imposto la nuova animation
 		            case "n": //north
                         $("#playerBody_"+e[0]).setAnimation(playerAnimation["up"]);
