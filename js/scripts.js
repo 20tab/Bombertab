@@ -63,15 +63,18 @@ jQuery(function(){
 	    playerAnimation["down"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
+        playerAnimation["die"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor_die.png", numberOfFrame: 12, delta: 50, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
 	    bombAnimation["drop"] =	new $.gameQuery.Animation({
         	imageURL: "img/bomb_drop.png", numberOfFrame: 5, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
 	    bombAnimation["loop"] = new $.gameQuery.Animation({
         	imageURL: "img/bomb_loop.png", numberOfFrame: 4, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-	    /*bombAnimation["explode"] = new $.gameQuery.Animation({
-	        imageURL: "img/bomb_explode.png"});
-	    */
+	    bombAnimation["explode"] =	new $.gameQuery.Animation({
+        	imageURL: "img/bomb_explode.png", numberOfFrame: 12, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
@@ -196,23 +199,41 @@ jQuery(function(){
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
                     case "k": // k=kill (rimuovi player_id 'p')
-            	        $("#player_"+msg['p']).remove();
+                        $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                            function(){
+                                $("#player_"+msg['p']).remove();
+                            }
+                        );
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-	                                        width: BOMB_W, height: BOMB_H})
-	                                    .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
-                                            posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
-                                $("#bombBody_"+msg['p']).setAnimation(bombAnimation["loop"]);
-                            }});	                      
+            	        if($("#bomb_"+msg['p']).get()){
+                	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+	                                            width: BOMB_W, height: BOMB_H})
+	                                        .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
+                                                posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
+                                    $("#bombBody_"+msg['p']).setAnimation(bombAnimation["loop"]);
+                                }});	              
+                         }        
                          break;
                     case "x": // x=explosion (esplode la bomba)
-            	    	$("#bomb_"+msg['p']).remove();
-            	    	//$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"]/*,
-            	    	 //   function(){
-            	    	 //       $("#bomb_"+msg['p']).remove();  
-            	    	//    }*/
-            	    	//);
+            	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],
+            	    	    function(){
+            	    	        $("#bomb_"+msg['p']).remove();                                 
+            	    	   }
+            	    	);
+            	    	
+            	    	
+            	    	/* SOLO TEST */ 
+            	    	setTimeout(   // devo aspettare 400 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
+                            function(){
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                	    	            function(){
+                                            $("#player_"+msg['p']).remove();
+                                        }
+                                    );
+                                }, 400);
+            	    	/* /SOLO TEST */ 
+            	    	
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione d)
             	    	$("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle"]);
