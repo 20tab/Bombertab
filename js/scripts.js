@@ -48,21 +48,28 @@ jQuery(function(){
 		$.playground().addSprite('grid',{height: PG_H, width: PG_W}).end();
 		
 		// imposto le animazioni da usare
-		playerAnimation["idle"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png",type: $.gameQuery.ANIMATION_HORIZONTAL});
-	    //playerAnimation["right"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_rl.png"});
+		playerAnimation["idle"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75});
 	    playerAnimation["right"]      = new $.gameQuery.Animation({
-        	imageURL: "img/er_king_right.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0});
-	    playerAnimation["left"] =	new $.gameQuery.Animation({imageURL: "img/er_king_ll.png"});
-	    playerAnimation["up"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_bl.png"});
-	    playerAnimation["down"] = 	new $.gameQuery.Animation({imageURL: "img/er_king_fl.png"});
-	    bombAnimation["drop"] =	new $.gameQuery.Animation({imageURL: "img/bomb.png"});
-	    bombAnimation["explode"] = new $.gameQuery.Animation({
-	        imageURL: "img/explosion.png"});//, numberOfFrame: 1, delta: 150, rate: 1000, type: $.gameQuery.ANIMATION_CALLBACK});
+        	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75});
+	    playerAnimation["left"] =	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225});
+	    playerAnimation["up"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0});
+	    playerAnimation["down"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150});
+	    bombAnimation["drop"] =	new $.gameQuery.Animation({
+        	imageURL: "img/bomb_drop.png", numberOfFrame: 5, delta: 150, rate: 250, type: $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0});
+	    bombAnimation["loop"] = new $.gameQuery.Animation({
+        	imageURL: "img/bomb_loop.png", numberOfFrame: 4, delta: 150, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0});
+	    /*bombAnimation["explode"] = new $.gameQuery.Animation({
+	        imageURL: "img/bomb_explode.png"});
+	    */
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
                       width: ACTOR_W, height: ACTOR_H})
-                .addSprite("playerBody_"+player_id,{animation: playerAnimation["idle"],
+                .addSprite("playerBody_"+player_id,{animation: playerAnimation["right"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 
         
@@ -127,21 +134,24 @@ jQuery(function(){
 		    send_stop = false;
 		}
 		
-		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino
-		    switch(e[3]){ //controllo la direzione
-		        case "n": //north
-                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["up"]);
-		            break;
-		        case "s": //south
-                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["down"]);
-		            break;
-		        case "w": //west
-                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["left"]);
-		            break;
-		        case "e": //east
-                    $("#playerBody_"+e[0]).setAnimation(playerAnimation["right"]);
-		            break;
-		    }
+		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
+            if(e[3]!=e[4]){   //se cambio direzione rispetto al frame precedente
+                switch(e[3]){ //controllo la direzione nuova e imposto la nuova animation
+		            case "n": //north
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["up"]);
+		                break;
+		            case "s": //south
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["down"]);
+		                break;
+		            case "w": //west
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["left"]);
+		                break;
+		            case "e": //east
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["right"]);
+		                break;
+		        }
+            }
+            //in ogni caso sposto il player alle nuove coordinate
 			$("#player_"+e[0]).css("left", ""+e[1]+"px");
 			$("#player_"+e[0]).css("top", ""+e[2]+"px");
 		}
@@ -180,17 +190,22 @@ jQuery(function(){
             	        $("#player_"+msg['p']).remove();
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-            	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+            	    	/*$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 	                      width: BOMB_W, height: BOMB_H})
 	                  .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
-                              posx: 0, posy: 0, width: BOMB_W, height: BOMB_H});
+                              posx: 0, posy: 0, width: BOMB_W, height: BOMB_H});*/
+                         /*$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+	                      width: BOMB_W, height: BOMB_H});*/
+	                      alert('dopo');
+	                      
                          break;
                     case "x": // x=explosion (esplode la bomba)
-            	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"]/*,
-            	    	    function(){
-            	    	        $("#bomb_"+msg['p']).remove();  
-            	    	    }*/
-            	    	);
+            	    	$("#bomb_"+msg['p']).remove();
+            	    	//$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"]/*,
+            	    	 //   function(){
+            	    	 //       $("#bomb_"+msg['p']).remove();  
+            	    	//    }*/
+            	    	//);
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione d)
             	    	$("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle"]);
