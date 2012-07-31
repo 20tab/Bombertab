@@ -216,9 +216,9 @@ class BomberTab(TremoloApp):
             bp.drop_bomb()
         elif msg['c'] == '0':
             for p in self.players:
-                player = self.players[p]
+                player = self.players[msg['p']]
                 enemy = self.players[p]
-                announce = {'c':'0', 'p':enemy.id, 'd':enemy.direction}
+                announce = {'c':'0', 'p':player.id, 'd':player.direction}
                 print "ANNOUNCE", json.dumps(announce)
                 enemy.session.send('websocket', json.dumps(announce))
         #print msg
