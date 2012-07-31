@@ -29,12 +29,13 @@ bomber_arena = [
 ]
 
 def bomb_task(bomber):
-    gevent.sleep(3)
+    gevent.sleep(4)
     print "EXPLODE !!!!"
     bomb = {'c':'x', 'p':bomber.id}
     for player in bomber.game.players:
         p = bomber.game.players[player]
         p.session.send('websocket', json.dumps(bomb))
+        gevent.sleep(1)
     bomber.dropped = False
 
 class BomberPlayer():
