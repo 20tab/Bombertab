@@ -167,9 +167,44 @@ jQuery(function(){
 		    //alert('mandato STOP da parte di '+player_id);
 		}
 		
-		while((msg = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
-		
-		
+		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
+            if(e[3] != $("#playerBody_"+e[0]).data('direction')){   //se cambio direzione rispetto al frame precedente
+                $("#playerBody_"+e[0]).data('direction', e[3]);
+                switch(e[3]){ //controllo la direzione nuova e imposto la nuova animation
+		            case "n": //north
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["up"]);
+		                break;
+		            case "s": //south
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["down"]);
+		                break;
+		            case "w": //west
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["left"]);
+		                break;
+		            case "e": //east
+                        $("#playerBody_"+e[0]).setAnimation(playerAnimation["right"]);
+		                break;
+		        }
+            }
+            //in ogni caso sposto il player alle nuove coordinate
+			$("#player_"+e[0]).css("left", ""+e[1]+"px");
+			$("#player_"+e[0]).css("top", ""+e[2]+"px");
+		}
+		lock = 0;
+	}
+	
+
+	
+	$('#startGame').on('click',function(){
+	    $('#startGame').html();
+		$.playground().startGame(function(){
+			
+			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
+			//ws = new WebSocket("ws://192.168.2.1:8080");
+			ws.onopen = function() {
+			        ws.send('{"c":"j"}');   //c=comando  j=join (chiedo al server di entrare)
+			};
+			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
+			    var msg = jQuery.parseJSON(evt.data);
 				switch(msg['c']){  // controllo quale comando viene passato
 				    case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, a=lista di blocchi dell'arena) 
 				        player_id = msg['p'];
@@ -177,29 +212,8 @@ jQuery(function(){
 				        $("#grid").html(arena(msg['a']));
 				        break;
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				    	
-			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
-                            switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
-		                        case "n": //north
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["up"]);
-		                            break;
-		                        case "s": //south
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["down"]);
-		                            break;
-		                        case "w": //west
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["left"]);
-		                            break;
-		                        case "e": //east
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["right"]);
-		                            break;
-		                    }
-                        }
-                        //in ogni caso sposto il player alle nuove coordinate
-			            $("#player_"+msg['p']).css("left", msg['x']+"px");
-			            $("#player_"+msg['p']).css("top", msg['y']+"px");
-
+				    	events.push([msg['p'],msg['x'],msg['y'],msg['d'],msg['o']]);
 				    	break;
-				    	
 				    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 			                                width: ACTOR_W, height: ACTOR_H})
@@ -257,7 +271,8 @@ jQuery(function(){
             	    	
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
-            	        switch(msg['d']){  // controllo quale direzione viene passata
+            	        $("#playerBody_"+msg['p']).data('direction', '0');
+            	        switch(msg['d']){  // controllo quale comando viene passato
 				            case "n":
                                 $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-n"]);
 				                break;
@@ -278,29 +293,8 @@ jQuery(function(){
 				    default:
 				    	break;
 				}
-		
-		
-		}
-		lock = 0;
-	}
-	
-
-	
-	$('#startGame').on('click',function(){
-	    $('#startGame').html();
-		$.playground().startGame(function(){
-			
-			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
-			//ws = new WebSocket("ws://192.168.2.1:8080");
-			ws.onopen = function() {
-			        ws.send('{"c":"j"}');   //c=comando  j=join (chiedo al server di entrare)
+			        
 			};
-			
-			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
-			    var msg = jQuery.parseJSON(evt.data);
-			    events.push(msg);
-			};			        
-
 			ws.onclose = function() {
 				alert("Connection is closed..."); 
 			};
