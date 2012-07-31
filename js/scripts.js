@@ -18,6 +18,7 @@ jQuery(function(){
 	var player_id = 0;
 	var events = Array();
 	
+	
 	function arena(grid){
 		var html_grid = "" 
 		var i = 0;
@@ -40,7 +41,9 @@ jQuery(function(){
 		return html_grid;
 	}
 	var playerAnimation = Array();
+	var playerSound = Array();
 	var bombAnimation = Array();
+	var bombSound = Array();
 	$('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
 	function init_arena(player_id,pos_x,pos_y,enemies){
 		
@@ -54,17 +57,29 @@ jQuery(function(){
 	    playerAnimation["right"]      = new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
+        playerAnimation["idle-e"]      = new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
 	    playerAnimation["left"] =	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
+        	});
+        playerAnimation["idle-w"] =	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
 	    playerAnimation["up"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
+        playerAnimation["idle-n"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
+        	});
 	    playerAnimation["down"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
+        playerAnimation["idle-s"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
+        	});
         playerAnimation["die"] = 	new $.gameQuery.Animation({
-        	imageURL: "img/emperor_die.png", numberOfFrame: 12, delta: 50, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	imageURL: "img/emperor_die.png", numberOfFrame: 22, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
 	    bombAnimation["drop"] =	new $.gameQuery.Animation({
         	imageURL: "img/bomb_drop.png", numberOfFrame: 5, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
@@ -75,6 +90,12 @@ jQuery(function(){
 	    bombAnimation["explode"] =	new $.gameQuery.Animation({
         	imageURL: "img/bomb_explode.png", numberOfFrame: 12, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
+        bombSound["explode"] = new Audio("sounds/bomb_explode.mp3");
+        bombSound["drop"] = new Audio("sounds/bomb_drop.mp3");
+        bombSound["loop"] = new Audio("sounds/bomb_loop.mp3");
+        playerSound["die"] = new Audio("sounds/player_die.mp3");
+        
+               
         
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
@@ -106,34 +127,35 @@ jQuery(function(){
 	
  	var lock = 0;
  	
- 	send_stop = true;
+ 	var send_stop = true;
+ 	var CAN_MOVE = true
 	
 	function eventsManager(){
 
 		if (lock) return;
 		lock = 1;
 	
-		if(jQuery.gameQuery.keyTracker[65]){ //this is left! (a)
+		if(jQuery.gameQuery.keyTracker[65] && CAN_MOVE){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
     	}
-    	else if(jQuery.gameQuery.keyTracker[68]){ //this is right! (d)
+    	else if(jQuery.gameQuery.keyTracker[68] && CAN_MOVE){ //this is right! (d)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[87]){ //this is up! (w)
+		else if(jQuery.gameQuery.keyTracker[87] && CAN_MOVE){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[83]){ //this is down! (s)
+		else if(jQuery.gameQuery.keyTracker[83] && CAN_MOVE){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space)
+		else if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space)
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
@@ -142,6 +164,7 @@ jQuery(function(){
 		    var message = {'c':'0','p':player_id};
 		    ws.send(JSON.stringify(message));
 		    send_stop = false;
+		    //alert('mandato STOP da parte di '+player_id);
 		}
 		
 		while((e = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
@@ -172,7 +195,7 @@ jQuery(function(){
 
 	
 	$('#startGame').on('click',function(){
-	    $('#startGame').remove();
+	    $('#startGame').html();
 		$.playground().startGame(function(){
 			
 			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
@@ -207,15 +230,19 @@ jQuery(function(){
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
             	        if($("#bomb_"+msg['p']).get()){
+            	            bombSound["drop"].play();
                 	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 	                                            width: BOMB_W, height: BOMB_H})
 	                                        .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
                                                 posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
+                                    bombSound["loop"].play();
                                     $("#bombBody_"+msg['p']).setAnimation(bombAnimation["loop"]);
                                 }});	              
                          }        
                          break;
                     case "x": // x=explosion (esplode la bomba)
+                        bombSound["loop"].pause();
+                        bombSound["explode"].play();       
             	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],
             	    	    function(){
             	    	        $("#bomb_"+msg['p']).remove();                                 
@@ -223,20 +250,43 @@ jQuery(function(){
             	    	);
             	    	
             	    	
-            	    	/* SOLO TEST */ 
-            	    	setTimeout(   // devo aspettare 400 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
+            	    	/* ************** SOLO TEST ************* */ 
+            	    	setTimeout(   // devo aspettare 500 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
                             function(){
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                                CAN_MOVE = false;
+                                setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
+                                                        //bisogna implementare un sistema migliore per sincronizzarli
+                                    playerSound["die"].play();
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
                 	    	            function(){
                                             $("#player_"+msg['p']).remove();
                                         }
                                     );
-                                }, 400);
-            	    	/* /SOLO TEST */ 
+                                }, 100);
+                                
+                        }, 500);
+            	    	/* ************* /SOLO TEST ************* */ 
             	    	
             	    	break;
-            	    case "0": // 0=stop (omino p fermo in x y con direzione d)
-            	    	$("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle"]);
+            	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
+            	        $("#playerBody_"+msg['p']).data('direction', '0');
+            	        switch(msg['d']){  // controllo quale comando viene passato
+				            case "n":
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-n"]);
+				                break;
+				            case "e":
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-e"]);
+				                break;
+				            case "s":
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-s"]);
+				                break;
+				            case "w":
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-w"]);
+				                break;
+				            default:
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle"]);
+				                break;
+				        }
             	    	break;
 				    default:
 				    	break;
