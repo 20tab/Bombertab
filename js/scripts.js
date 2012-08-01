@@ -167,7 +167,9 @@ jQuery(function(){
 		    //alert('mandato STOP da parte di '+player_id);
 		}
 		
-		while((msg = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
+		while((msg_queue = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
+		
+		        var msg = msg_queue;
                 
 				switch(msg['c']){  // controllo quale comando viene passato
 				    /*case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, a=lista di blocchi dell'arena) 
@@ -218,8 +220,7 @@ jQuery(function(){
                 	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 	                                            width: BOMB_W, height: BOMB_H})
 	                                        .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
-                                                posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){   IL BUG È CHE QUI DENTRO NON LEGGE msg
-                                                alert(msg['c']+" - "+msg['p']);
+                                                posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
                                     bombSound["loop"].play();
                                     $("#bombBody_"+msg['p']).setAnimation(bombAnimation["loop"]);
                                 }});	              
