@@ -22,8 +22,9 @@ jQuery(function(){
 	
 	/* log */
 	
-	function write_log(str){
-	    $("#log").prepend(str+'<br/>');
+	function write_log(str, color){
+	    if(!color){color = 'black';}
+	    $("#log").prepend('<span style="color:'+color+'">'+str+'</span><br/>');
 	}
 	
 	/* /log */
@@ -189,8 +190,9 @@ jQuery(function(){
 				        $("#grid").html(arena(msg['a']));
 				        break;*/
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				        write_log('d: 'msg['d']+" - o: "+msg['o']);
+				        write_log('d: '+msg['d']+" - o: "+msg['o']);
 			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
+			                write_log('cambio dir','red');
                             switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
 		                        case "n": //north
                                     $("#playerBody_"+msg['p']).setAnimation(playerAnimation["up"]);
