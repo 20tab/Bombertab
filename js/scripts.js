@@ -63,7 +63,7 @@ jQuery(function(){
 	var playerSound = Array();
 	var bombAnimation = Array();
 	var bombSound = Array();
-	$('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
+	
 	function init_arena(player_id,pos_x,pos_y,enemies){
 		
 		// inizializzo la griglia con la sprite  da usare
@@ -293,8 +293,13 @@ jQuery(function(){
 	
 
 	
-	$('#startGame').on('click',function(){
-	    $('#startGame').html();
+	$('.choose_player').on('click',function(){
+	    //$('#startGame').html();
+	    
+	    $('#select_player').fadeOut();
+	    $('#playground').fadeIn();
+	    $('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
+	    
 		$.playground().startGame(function(){
 			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
 			//ws = new WebSocket("ws://192.168.2.1:8080");

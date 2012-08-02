@@ -1,3 +1,7 @@
+body{
+    /*background-color: black;*/
+}
+
 .grid-cell{
 	border:0px solid gray;
 	float:left;
@@ -16,6 +20,42 @@
 	clear: both;
 	height:0px;
 	width:100%;
+}
+
+#playground{
+    position: absolute;
+    top:0; left: 0;
+    display: none;
+    }
+
+#select_player{
+    background: black url('../img/goldenaxe.png') no-repeat center center;
+    position: absolute;
+    top:0; left: 0;
+    width: 950px;
+    height: 550px;
+}
+#emperor_player{
+    position: absolute;
+    top: 340px; left: 200px;
+    height: 200px; width: 200px;
+}
+#vassal_player{
+    position: absolute;
+    top: 300px; left: 300px;
+    height: 150px; width: 150px;
+}
+#mule_player{
+    position: absolute;
+    top: 300px; left: 150px;
+    height: 150px; width: 150px;
+    opacity: 0.7;
+}
+#select_player img{
+    border-bottom: 0;
+}
+#select_player img:hover{
+    cursor: pointer;
 }
 
 #log{
