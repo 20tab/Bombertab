@@ -221,12 +221,22 @@ jQuery(function(){
 		                                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
-                    case "k": // k=kill (rimuovi player_id 'p')
-                        $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                    case "k": // k=kill (rimuovi player_id 'p')                        
+                        setTimeout(   // devo aspettare 500 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
                             function(){
-                                $("#player_"+msg['p']).remove();
-                            }
-                        );
+                                if(msg['p']==player_id){
+                                    CAN_MOVE = false;
+                                }
+                                setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
+                                                        //bisogna implementare un sistema migliore per sincronizzarli
+                                    playerSound["die"].play();
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                	    	            function(){
+                                            $("#player_"+msg['p']).remove();
+                                        }
+                                    );
+                                }, 100);
+                        }, 500);
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
             	        if($("#bomb_"+msg['p']).get()){
@@ -248,26 +258,6 @@ jQuery(function(){
             	    	        $("#bomb_"+msg['p']).remove();                                 
             	    	   }
             	    	);
-            	    	
-            	    	
-            	    	/* ************** SOLO TEST ************* */ 
-            	    	setTimeout(   // devo aspettare 500 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
-                            function(){
-                                if(msg['p']==player_id){
-                                    CAN_MOVE = false;
-                                }
-                                setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
-                                                        //bisogna implementare un sistema migliore per sincronizzarli
-                                    playerSound["die"].play();
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
-                	    	            function(){
-                                            $("#player_"+msg['p']).remove();
-                                        }
-                                    );
-                                }, 100);
-                                
-                        }, 500);
-            	    	/* ************* /SOLO TEST ************* */ 
             	    	
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione 0)

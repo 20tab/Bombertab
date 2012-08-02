@@ -26,7 +26,9 @@
 	height:300px;
 	overflow: auto;
 	color: black;
-	opacity: 0.5;
+	opacity: 0.7;
+	background-color: white;
 	line-height: 70%;
 	font-family: Courier;
+	z-index: 999999;
 }
