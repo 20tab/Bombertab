@@ -22,10 +22,16 @@ jQuery(function(){
 	
 	/* log */
 	
+	var last_log = new Date();
 	function write_log(str, color){
 	    if(!color){color = 'black';}
     	var d = new Date();
+    	diff = d - last_log;
+    	if(diff > 64){
+    	    $("#log").prepend('<b style="color:red; font-size: 1.1em;">interval:'+diff+'</b> ');
+    	}
 	    $("#log").prepend('<span style="color:'+color+'">'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+':'+d.getMilliseconds()+' '+str+'</span><br/>');
+	    last_log = d;
 	}
 	
 	/* /log */
