@@ -22,13 +22,14 @@
     position: fixed;
     top: 0; right: 0;
 	border:1px solid red;
-	width:300px;
-	height:300px;
+	width:400px;
+	height:500px;
 	overflow: auto;
 	color: black;
 	opacity: 0.7;
 	background-color: white;
 	line-height: 70%;
 	font-family: Courier;
+	letter-spacing: -2px;
 	z-index: 999999;
 }
