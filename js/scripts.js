@@ -184,9 +184,9 @@ jQuery(function(){
 				        $("#grid").html(arena(msg['a']));
 				        break;*/
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				        write_log('d: '+msg['d']+" - o: "+msg['o']);
+				        write_log('PLAYER: '+msg['p']+' | d: '+msg['d']+" - o: "+msg['o']);
 			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
-			                write_log('cambio dir','red');
+			                write_log('PLAYER: '+msg['p']+' | cambio dir','orange');
                             switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
 		                        case "n": //north
                                     $("#playerBody_"+msg['p']).setAnimation(playerAnimation["up"]);
@@ -215,7 +215,8 @@ jQuery(function(){
 		                                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
-                    case "k": // k=kill (rimuovi player_id 'p')                        
+                    case "k": // k=kill (rimuovi player_id 'p')
+                        write_log('PLAYER: '+msg['p']+' | muoio','red');                        
                         if(msg['p']==player_id){
                             CAN_MOVE = false;
                         }
@@ -224,12 +225,15 @@ jQuery(function(){
                             playerSound["die"].play();
                             $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
         	    	            function(){
+        	    	                write_log('PLAYER: '+msg['p']+' | morendo','red');
                                     $("#player_"+msg['p']).remove();
+                                    write_log('PLAYER: '+msg['p']+' | morto','red');
                                 }
                             );
-                        }, 100);
+                        }, 200);
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
+            	        write_log('PLAYER: '+msg['p']+' | lascio la bomba '+'p: '+msg['p'],'red');
             	        if($("#bomb_"+msg['p']).get()){
             	            bombSound["drop"].play();
                 	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
@@ -242,16 +246,20 @@ jQuery(function(){
                          }        
                          break;
                     case "x": // x=explosion (esplode la bomba)
+                        write_log('PLAYER: '+msg['p']+' | esplode la bomba '+'p: '+msg['p'],'red');
                         bombSound["loop"].pause();
                         bombSound["explode"].play();       
             	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],
             	    	    function(){
-            	    	        $("#bomb_"+msg['p']).remove();                                 
+            	    	        write_log('PLAYER: '+msg['p']+' | rimuovendo la bomba '+'p: '+msg['p'],'red');
+            	    	        $("#bomb_"+msg['p']).remove();
+            	    	        write_log('PLAYER: '+msg['p']+' | rimossa la bomba '+'p: '+msg['p'],'red');                                 
             	    	   }
             	    	);
             	    	
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
+            	        write_log('PLAYER: '+msg['p']+' | idle','blue');
             	        switch(msg['d']){  // controllo quale direzione viene passata
 				            case "n":
                                 $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-n"]);
