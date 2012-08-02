@@ -134,18 +134,17 @@ jQuery(function(){
 	
 	var ws;
 	
-	
-	
-	
- 	var lock = 0;
  	
  	var send_stop = true;
  	var CAN_MOVE = true
 	
 	function eventsManager(){
-
-		if (lock) return;
-		lock = 1;
+	
+	    if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
+			var message = {'c':'b','p':player_id};
+			ws.send(JSON.stringify(message));
+			send_stop = true;
+		}
 	
 		if(jQuery.gameQuery.keyTracker[65] && CAN_MOVE){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
@@ -164,11 +163,6 @@ jQuery(function(){
 		}
 		else if(jQuery.gameQuery.keyTracker[83] && CAN_MOVE){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
-			ws.send(JSON.stringify(message));
-			send_stop = true;
-		}
-		else if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space)
-			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
 			send_stop = true;
 		}
@@ -222,21 +216,18 @@ jQuery(function(){
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
                     case "k": // k=kill (rimuovi player_id 'p')                        
-                        setTimeout(   // devo aspettare 500 millisec perchè i primi frame dell'esplosione sono ancora senza fuoco
-                            function(){
-                                if(msg['p']==player_id){
-                                    CAN_MOVE = false;
+                        if(msg['p']==player_id){
+                            CAN_MOVE = false;
+                        }
+                        setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
+                                                //bisogna implementare un sistema migliore per sincronizzarli
+                            playerSound["die"].play();
+                            $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+        	    	            function(){
+                                    $("#player_"+msg['p']).remove();
                                 }
-                                setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
-                                                        //bisogna implementare un sistema migliore per sincronizzarli
-                                    playerSound["die"].play();
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
-                	    	            function(){
-                                            $("#player_"+msg['p']).remove();
-                                        }
-                                    );
-                                }, 100);
-                        }, 500);
+                            );
+                        }, 100);
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
             	        if($("#bomb_"+msg['p']).get()){
@@ -282,10 +273,7 @@ jQuery(function(){
 				    default:
 				    	break;
 				}
-		
-		
 		}
-		lock = 0;
 	}
 	
 
