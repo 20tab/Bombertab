@@ -333,6 +333,7 @@ jQuery(function(){
             	    	        $("#bomb_"+msg['p']).remove();
             	    	        var message = {'c':'p','p':msg['p']};
                     			ws.send(JSON.stringify(message));
+                    			write_log('send msg: '+JSON.stringify(message),'black',2);
             	    	        write_log('p: '+msg['p']+' | rimossa la bomba '+'p: '+msg['p'],'red');                                 
             	    	   }
             	    	);
