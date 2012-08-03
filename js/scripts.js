@@ -15,6 +15,7 @@ jQuery(function(){
 	var EXPLOSION_H = 150;
 	var RATE = 60;
 	
+	var avatar = 'e';
 	var player_id = 0;
 	var events = Array();
 	
@@ -22,16 +23,17 @@ jQuery(function(){
 	
 	/* log */
 	
-	var last_log = new Date();
-	function write_log(str, color){
+	var last_log = [new Date(),new Date(),new Date()];
+	function write_log(str, color, table){
 	    if(!color){color = 'black';}
+	    if(!table){table = 0;} //0=screen 1=in 2=out
     	var d = new Date();
-    	diff = d - last_log;
+    	diff = d - last_log[table];
     	if(diff > 64){
-    	    $("#log").prepend('<b style="color:red; font-size: 1.1em;">interval:'+diff+'</b> ');
+    	    $("#log_"+table).prepend('<b style="color:red; font-size: 1.1em;">interval:'+diff+'</b> ');
     	}
-	    $("#log").prepend('<span style="color:'+color+'">'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+':'+d.getMilliseconds()+' '+str+'</span><br/>');
-	    last_log = d;
+	    $("#log_"+table).prepend('<span style="color:'+color+'">'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+':'+d.getMilliseconds()+' '+str+'</span><br/>');
+	    last_log[table] = d;
 	}
 	
 	/* /log */
@@ -64,42 +66,105 @@ jQuery(function(){
 	var bombAnimation = Array();
 	var bombSound = Array();
 	
-	function init_arena(player_id,pos_x,pos_y,enemies){
+	function init_arena(player_id,avatar,pos_x,pos_y,enemies){
 		
 		// inizializzo la griglia con la sprite  da usare
 		$.playground().addSprite('grid',{height: PG_H, width: PG_W}).end();
 		
 		// imposto le animazioni da usare
-		playerAnimation["idle"] = 	new $.gameQuery.Animation({
+		playerAnimation["e_idle"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["right"]      = new $.gameQuery.Animation({
+	    playerAnimation["e_right"]      = new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-        playerAnimation["idle-e"]      = new $.gameQuery.Animation({
+        playerAnimation["e_idle-e"]      = new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["left"] =	new $.gameQuery.Animation({
+	    playerAnimation["e_left"] =	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
-        playerAnimation["idle-w"] =	new $.gameQuery.Animation({
+        playerAnimation["e_idle-w"] =	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
-	    playerAnimation["up"] = 	new $.gameQuery.Animation({
+	    playerAnimation["e_up"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-        playerAnimation["idle-n"] = 	new $.gameQuery.Animation({
+        playerAnimation["e_idle-n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-	    playerAnimation["down"] = 	new $.gameQuery.Animation({
+	    playerAnimation["e_down"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
-        playerAnimation["idle-s"] = 	new $.gameQuery.Animation({
+        playerAnimation["e_idle-s"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
-        playerAnimation["die"] = 	new $.gameQuery.Animation({
+        playerAnimation["e_die"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
+        	
+		playerAnimation["v_idle"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+	    playerAnimation["v_right"]      = new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+        playerAnimation["v_idle-e"]      = new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+	    playerAnimation["v_left"] =	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
+        	});
+        playerAnimation["v_idle-w"] =	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
+        	});
+	    playerAnimation["v_up"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
+        	});
+        playerAnimation["v_idle-n"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
+        	});
+	    playerAnimation["v_down"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
+        	});
+        playerAnimation["v_idle-s"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
+        	});
+        playerAnimation["v_die"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
+        	
+		playerAnimation["m_idle"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+	    playerAnimation["m_right"]      = new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+        playerAnimation["m_idle-e"]      = new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
+        	});
+	    playerAnimation["m_left"] =	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
+        	});
+        playerAnimation["m_idle-w"] =	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
+        	});
+	    playerAnimation["m_up"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
+        	});
+        playerAnimation["m_idle-n"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
+        	});
+	    playerAnimation["m_down"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
+        	});
+        playerAnimation["m_idle-s"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
+        	});
+        playerAnimation["m_die"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
+        	
 	    bombAnimation["drop"] =	new $.gameQuery.Animation({
         	imageURL: "img/bomb_drop.png", numberOfFrame: 5, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
@@ -119,15 +184,15 @@ jQuery(function(){
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
                       width: ACTOR_W, height: ACTOR_H})
-                .addSprite("playerBody_"+player_id,{animation: playerAnimation["idle"],
+                .addSprite("playerBody_"+player_id,{animation: playerAnimation[avatar+"_idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 
         
         // aggiungo i nemici
         for(i in enemies){
-        	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][1], posy: enemies[i][2],
+        	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][2], posy: enemies[i][3],
                       width: ACTOR_W, height: ACTOR_H})
-                  .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation["idle"],
+                  .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation[enemies[i][1]+"_idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
         }
 		
@@ -150,32 +215,38 @@ jQuery(function(){
 	    if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
+			write_log('send msg: '+message,'black',2);
 			send_stop = true;
 		}
 	
 		if(jQuery.gameQuery.keyTracker[65] && CAN_MOVE){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
+			write_log('send msg: '+message,'black',2);
 			send_stop = true;
     	}
     	else if(jQuery.gameQuery.keyTracker[68] && CAN_MOVE){ //this is right! (d)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
+			write_log('send msg: '+message,'black',2);
 			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[87] && CAN_MOVE){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
+			write_log('send msg: '+message,'black',2);
 			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[83] && CAN_MOVE){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
+			write_log('send msg: '+message,'black',2);
 			send_stop = true;
 		}
 		else if(send_stop){
 		    var message = {'c':'0','p':player_id};
 		    ws.send(JSON.stringify(message));
+		    write_log('send msg: '+message,'black',2);
 		    send_stop = false;
 		    //alert('mandato STOP da parte di '+player_id);
 		}
@@ -196,16 +267,16 @@ jQuery(function(){
 			                write_log('p: '+msg['p']+' | cambio dir','orange');
                             switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
 		                        case "n": //north
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["up"]);
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_up"]);
 		                            break;
 		                        case "s": //south
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["down"]);
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_down"]);
 		                            break;
 		                        case "w": //west
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["left"]);
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_left"]);
 		                            break;
 		                        case "e": //east
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation["right"]);
+                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_right"]);
 		                            break;
 		                    }
                         }
@@ -218,7 +289,7 @@ jQuery(function(){
 				    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
 				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
 			                                width: ACTOR_W, height: ACTOR_H})
-			                          .addSprite("playerBody_"+msg['p'],{animation: playerAnimation["idle"],
+			                          .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
 		                                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
@@ -230,7 +301,7 @@ jQuery(function(){
                         setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
                                                 //bisogna implementare un sistema migliore per sincronizzarli
                             playerSound["die"].play();
-                            $("#playerBody_"+msg['p']).setAnimation(playerAnimation["die"], 
+                            $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_die"], 
         	    	            function(){
         	    	                write_log('p: '+msg['p']+' | morendo','red');
                                     $("#player_"+msg['p']).remove();
@@ -269,19 +340,19 @@ jQuery(function(){
             	        write_log('p: '+msg['p']+' | idle','blue');
             	        switch(msg['d']){  // controllo quale direzione viene passata
 				            case "n":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-n"]);
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-n"]);
 				                break;
 				            case "e":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-e"]);
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-e"]);
 				                break;
 				            case "s":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-s"]);
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-s"]);
 				                break;
 				            case "w":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle-w"]);
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-w"]);
 				                break;
 				            default:
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation["idle"]);
+                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle"]);
 				                break;
 				        }
             	    	break;
@@ -296,7 +367,7 @@ jQuery(function(){
 	$('.choose_player').on('click',function(){
 	    //$('#startGame').html();
 	    
-	    //alert($(this).val('id'));
+	    avatar = $(this).data('avatar');
 	    $('#select_player').fadeOut();
 	    $('#playground').fadeIn();
 	    $('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
@@ -305,16 +376,18 @@ jQuery(function(){
 			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
 			//ws = new WebSocket("ws://192.168.2.1:8080");
 			ws.onopen = function() {
-			        ws.send('{"c":"j"}');   //c=comando  j=join (chiedo al server di entrare)
+			        ws.send('{"c":"j", "a":"'+avatar+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
 			};
 			
 			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
 			    var msg = jQuery.parseJSON(evt.data);
+			    write_log('received msg: '+msg,'black',1);
 				    switch(msg['c']){  // controllo quale comando viene passato
-				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, a=lista di blocchi dell'arena) 
+				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
 				            player_id = msg['p'];
-				            init_arena(player_id,msg['x'],msg['y'],msg['e']);
-				            $("#grid").html(arena(msg['a']));
+				            avatar = msg['a'];
+				            init_arena(player_id,msg['a'],msg['x'],msg['y'],msg['e']);
+				            $("#grid").html(arena(msg['b']));
 				            break;
 				        default: // tutti gli altri li accodi
 				        	//events.push([msg['p'],msg['x'],msg['y'],msg['d'],msg['o']]);

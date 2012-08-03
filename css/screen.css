@@ -59,12 +59,11 @@ body{
     border-bottom: 4px red solid;
 }
 
-#log{
+div.log{
     position: fixed;
-    top: 0; right: 0;
 	border:1px solid red;
 	width:400px;
-	height:500px;
+	height:200px;
 	overflow: auto;
 	color: black;
 	opacity: 0.7;
@@ -74,3 +73,6 @@ body{
 	letter-spacing: -2px;
 	z-index: 999999;
 }
+#log_0 {top: 0; right: 0;}
+#log_1 {top: 210px; right: 0;}
+#log_2 {top: 420px; right: 0;}
