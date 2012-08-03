@@ -215,38 +215,38 @@ jQuery(function(){
 	    if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
-			write_log('send msg: '+message,'black',2);
+			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 	
 		if(jQuery.gameQuery.keyTracker[65] && CAN_MOVE){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
-			write_log('send msg: '+message,'black',2);
+			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
     	}
     	else if(jQuery.gameQuery.keyTracker[68] && CAN_MOVE){ //this is right! (d)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
-			write_log('send msg: '+message,'black',2);
+			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[87] && CAN_MOVE){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
-			write_log('send msg: '+message,'black',2);
+			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 		else if(jQuery.gameQuery.keyTracker[83] && CAN_MOVE){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
-			write_log('send msg: '+message,'black',2);
+			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 		else if(send_stop){
 		    var message = {'c':'0','p':player_id};
 		    ws.send(JSON.stringify(message));
-		    write_log('send msg: '+message,'black',2);
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
 		    send_stop = false;
 		    //alert('mandato STOP da parte di '+player_id);
 		}
@@ -262,7 +262,7 @@ jQuery(function(){
 				        $("#grid").html(arena(msg['a']));
 				        break;*/
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				        write_log('p: '+msg['p']+' | d: '+msg['d']+" - o: "+msg['o']);
+				        write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
 			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
 			                write_log('p: '+msg['p']+' | cambio dir','orange');
                             switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
@@ -381,7 +381,7 @@ jQuery(function(){
 			
 			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
 			    var msg = jQuery.parseJSON(evt.data);
-			    write_log('received msg: '+msg,'black',1);
+			    write_log('received msg: '+JSON.stringify(msg),'black',1);
 				    switch(msg['c']){  // controllo quale comando viene passato
 				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
 				            player_id = msg['p'];
