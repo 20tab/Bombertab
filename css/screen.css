@@ -37,25 +37,26 @@ body{
 }
 #emperor_player{
     position: absolute;
-    top: 340px; left: 200px;
-    height: 200px; width: 200px;
+    top: 350px; left: 220px;
+    width: 100px;
 }
 #vassal_player{
     position: absolute;
     top: 300px; left: 300px;
-    height: 150px; width: 150px;
+    width: 80px;
 }
 #mule_player{
     position: absolute;
-    top: 300px; left: 150px;
-    height: 150px; width: 150px;
-    opacity: 0.7;
+    top: 300px; left: 160px;
+    width: 80px;
+    opacity: 0.4;
 }
 #select_player img{
     border-bottom: 0;
 }
 #select_player img:hover{
     cursor: pointer;
+    border-bottom: 4px red solid;
 }
 
 #log{

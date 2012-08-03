@@ -296,6 +296,7 @@ jQuery(function(){
 	$('.choose_player').on('click',function(){
 	    //$('#startGame').html();
 	    
+	    //alert($(this).val('id'));
 	    $('#select_player').fadeOut();
 	    $('#playground').fadeIn();
 	    $('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
