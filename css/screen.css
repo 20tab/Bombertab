@@ -49,7 +49,7 @@ body{
     position: absolute;
     top: 300px; left: 160px;
     width: 80px;
-    opacity: 0.4;
+    /*opacity: 0.4;*/
 }
 #select_player img{
     border-bottom: 0;

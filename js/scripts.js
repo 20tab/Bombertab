@@ -264,7 +264,7 @@ jQuery(function(){
 				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
 				        write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
 			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
-			                write_log('p: '+msg['p']+' | cambio dir','orange');
+			                write_log('p: '+msg['p']+'/'+msg['a']+' | cambio dir','orange');
                             switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
 		                        case "n": //north
                                     $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_up"]);
@@ -294,7 +294,7 @@ jQuery(function(){
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
                     case "k": // k=kill (rimuovi player_id 'p')
-                        write_log('p: '+msg['p']+' | muoio','red');                        
+                        write_log('p: '+msg['p']+'/'+msg['a']+' | muoio','red');                        
                         if(msg['p']==player_id){
                             CAN_MOVE = false;
                         }
@@ -331,13 +331,15 @@ jQuery(function(){
             	    	    function(){
             	    	        write_log('p: '+msg['p']+' | rimuovendo la bomba '+'p: '+msg['p'],'red');
             	    	        $("#bomb_"+msg['p']).remove();
+            	    	        var message = {'c':'p','p':msg['p']};
+                    			ws.send(JSON.stringify(message));
             	    	        write_log('p: '+msg['p']+' | rimossa la bomba '+'p: '+msg['p'],'red');                                 
             	    	   }
             	    	);
             	    	
             	    	break;
             	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
-            	        write_log('p: '+msg['p']+' | idle','blue');
+            	        write_log('p: '+msg['p']+'/'+msg['a']+' | idle','blue');
             	        switch(msg['d']){  // controllo quale direzione viene passata
 				            case "n":
                                 $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-n"]);
