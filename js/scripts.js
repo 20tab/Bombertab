@@ -23,17 +23,21 @@ jQuery(function(){
 	
 	/* log */
 	
+	var DEBUG = true;
+	
 	var last_log = [new Date(),new Date(),new Date()];
 	function write_log(str, color, table){
-	    if(!color){color = 'black';}
-	    if(!table){table = 0;} //0=screen 1=in 2=out
-    	var d = new Date();
-    	diff = d - last_log[table];
-    	if(diff > 64){
-    	    $("#log_"+table).prepend('<b style="color:red; font-size: 1.1em;">interval:'+diff+'</b> ');
-    	}
-	    $("#log_"+table).prepend('<span style="color:'+color+'">'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+':'+d.getMilliseconds()+' '+str+'</span><br/>');
-	    last_log[table] = d;
+	    if(DEBUG){
+	        if(!color){color = 'black';}
+	        if(!table){table = 0;} //0=screen 1=in 2=out
+        	var d = new Date();
+        	diff = d - last_log[table];
+        	if(diff > 64){
+        	    $("#log_"+table).prepend('<b style="color:red; font-size: 1.1em;">interval:'+diff+'</b> ');
+        	}
+	        $("#log_"+table).prepend('<span style="color:'+color+'">'+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+':'+d.getMilliseconds()+' '+str+'</span><br/>');
+	        last_log[table] = d;
+	    }
 	}
 	
 	/* /log */
