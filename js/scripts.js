@@ -298,47 +298,50 @@ jQuery(function(){
 		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
 		                         break;
                     case "k": // k=kill (rimuovi player_id 'p')
-                        write_log('p: '+msg['p']+'/'+msg['a']+' | muoio','red');                        
-                        if(msg['p']==player_id){
+                        var curr_mess = msg
+                        write_log('p: '+curr_mess['p']+'/'+curr_mess['a']+' | muoio','red');                        
+                        if(curr_mess['p']==player_id){
                             CAN_MOVE = false;
                         }
-                        setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
+                        //setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
                                                 //bisogna implementare un sistema migliore per sincronizzarli
                             playerSound["die"].play();
-                            $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_die"], 
+                            $("#playerBody_"+curr_mess['p']).setAnimation(playerAnimation[curr_mess['a']+"_die"], 
         	    	            function(){
-        	    	                write_log('p: '+msg['p']+' | morendo','red');
-                                    $("#player_"+msg['p']).remove();
-                                    write_log('p: '+msg['p']+' | morto','red');
+        	    	                write_log('p: '+curr_mess['p']+' | morendo','red');
+                                    $("#player_"+curr_mess['p']).remove();
+                                    write_log('p: '+curr_mess['p']+' | morto','red');
                                 }
                             );
-                        }, 200);
+                        //}, 200);
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-            	        write_log('p: '+msg['p']+' | lascio la bomba '+'p: '+msg['p'],'red');
-            	        if($("#bomb_"+msg['p']).get()){
+                	    var curr_mess = msg
+            	        write_log('p: '+curr_mess['p']+' | lascio la bomba '+'p: '+curr_mess['p'],'red');
+            	        if($("#bomb_"+curr_mess['p']).get()){
             	            bombSound["drop"].play();
-                	    	$.playground().addGroup("bomb_"+msg['p'], {posx: msg['x'], posy: msg['y'],
+                	    	$.playground().addGroup("bomb_"+curr_mess['p'], {posx: curr_mess['x'], posy: curr_mess['y'],
 	                                            width: BOMB_W, height: BOMB_H})
 	                                        .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
                                                 posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
                                     bombSound["loop"].play();
-                                    $("#bombBody_"+msg['p']).setAnimation(bombAnimation["loop"]);
+                                    $("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["loop"]);
                                 }});	              
                          }        
                          break;
                     case "x": // x=explosion (esplode la bomba)
-                        write_log('p: '+msg['p']+' | esplode la bomba '+'p: '+msg['p'],'red');
+                        var curr_mess = msg
+                        write_log('p: '+curr_mess['p']+' | esplode la bomba '+'p: '+curr_mess['p'],'red');
                         bombSound["loop"].pause();
                         bombSound["explode"].play();       
-            	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],
+            	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],           	    	
             	    	    function(){
-            	    	        write_log('p: '+msg['p']+' | rimuovendo la bomba '+'p: '+msg['p'],'red');
-            	    	        $("#bomb_"+msg['p']).remove();
-            	    	        var message = {'c':'r','p':msg['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
+            	    	        write_log('p: '+curr_mess['p']+' | rimuovendo la bomba '+'p: '+curr_mess['p'],'red');
+            	    	        $("#bomb_"+curr_mess['p']).remove();
+            	    	        var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
                     			ws.send(JSON.stringify(message));
                     			write_log('send msg: '+JSON.stringify(message),'black',2);
-            	    	        write_log('p: '+msg['p']+' | rimossa la bomba '+'p: '+msg['p'],'red');                                 
+            	    	        write_log('p: '+curr_mess['p']+' | rimossa la bomba '+'p: '+curr_mess['p'],'red');                                 
             	    	   }
             	    	);
             	    	
@@ -387,18 +390,18 @@ jQuery(function(){
 			};
 			
 			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
-			    var msg = jQuery.parseJSON(evt.data);
-			    write_log('received msg: '+JSON.stringify(msg),'black',1);
-				    switch(msg['c']){  // controllo quale comando viene passato
+			    var msg_in = jQuery.parseJSON(evt.data);
+			    write_log('received msg: '+JSON.stringify(msg_in),'black',1);
+				    switch(msg_in['c']){  // controllo quale comando viene passato
 				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
-				            player_id = msg['p'];
-				            avatar = msg['a'];
-				            init_arena(player_id,msg['a'],msg['x'],msg['y'],msg['e']);
-				            $("#grid").html(arena(msg['b']));
+				            player_id = msg_in['p'];
+				            avatar = msg_in['a'];
+				            init_arena(player_id,msg_in['a'],msg_in['x'],msg_in['y'],msg_in['e']);
+				            $("#grid").html(arena(msg_in['b']));
 				            break;
 				        default: // tutti gli altri li accodi
 				        	//events.push([msg['p'],msg['x'],msg['y'],msg['d'],msg['o']]);
-				        	events.push(msg);
+				        	events.push(msg_in);
 				        	break;
 				    }
 			};			        
