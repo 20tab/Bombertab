@@ -208,40 +208,144 @@ jQuery(function(){
 		alert("WebSockets are not supported by your Browser!");
 	}
 	
+		
 	var ws;
 	
- 	
  	var send_stop = true;
- 	var CAN_MOVE = true
+	
+	
+	// inizializzo le funzioni che rispondono ai vari eventi gestiti da eventsManager, che usero' a seconda del command processato
+	// k - kill
+	function anim_kill(curr_mess){                   
+        playerSound["die"].play();
+        write_log('p: '+curr_mess['p']+' | morendo','red');
+        $("#playerBody_"+curr_mess['p']).setAnimation(playerAnimation[curr_mess['a']+"_die"], 
+            function(){
+                write_log('p: '+curr_mess['p']+' | rimuovendo','red');
+                $("#player_"+curr_mess['p']).remove();
+                write_log('p: '+curr_mess['p']+' | morto e rimosso','red');
+            }
+        );
+
+    }
+    
+    // m - move
+    function anim_move(msg){
+        write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
+        if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
+            write_log('p: '+msg['p']+'/'+msg['a']+' | cambio dir','orange');
+            switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
+                case "n": //north
+                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_up"]);
+                    break;
+                case "s": //south
+                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_down"]);
+                    break;
+                case "w": //west
+                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_left"]);
+                    break;
+                case "e": //east
+                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_right"]);
+                    break;
+            }
+        }
+        //in ogni caso sposto il player alle nuove coordinate
+        $("#player_"+msg['p']).css("left", msg['x']+"px");
+        $("#player_"+msg['p']).css("top", msg['y']+"px");
+    }
+    
+    // p - add player
+	function anim_add_player(msg){
+	    $.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'], width: ACTOR_W, height: ACTOR_H})
+             .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
+                   posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+	}
+	
+	// b - drop bomb
+    function anim_drop_bomb(curr_mess){
+	    write_log('p: '+curr_mess['p']+' | lascio la bomba '+'p: '+curr_mess['p'],'red');
+        if($("#bomb_"+curr_mess['p']).get()){
+            write_log('p: '+curr_mess['p']+' | inizio sequenza drop '+'p: '+curr_mess['p'],'red');
+            bombSound["drop"].play();
+	    	$.playground().addGroup("bomb_"+curr_mess['p'], {posx: curr_mess['x'], posy: curr_mess['y'],
+                                width: BOMB_W, height: BOMB_H})
+                            .addSprite("bombBody_"+curr_mess['p'],{animation: bombAnimation["drop"],
+                                posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
+                    write_log('p: '+curr_mess['p']+' | inizio sequenza loop '+'p: '+curr_mess['p'],'red');
+                    bombSound["loop"].play();
+                    $("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["loop"]);
+                }});	              
+        }  
+    }
+    
+    // x - explosion                        
+    function anim_explode(curr_mess){
+    	write_log('p: '+curr_mess['p']+' | esplode la bomba '+'p: '+curr_mess['p'],'red'); 
+        bombSound["loop"].pause();
+        bombSound["explode"].play();       
+    	$("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["explode"],           	    	
+    	    function(){
+    	        write_log('p: '+curr_mess['p']+' | rimuovendo la bomba '+'p: '+curr_mess['p'],'red');
+    	        $("#bomb_"+curr_mess['p']).remove();
+    	        var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
+    			ws.send(JSON.stringify(message));
+    			write_log('send msg: '+JSON.stringify(message),'black',2);
+    	        write_log('p: '+curr_mess['p']+' | rimossa la bomba '+'p: '+curr_mess['p'],'red');                                 
+    	   }
+    	);                       
+    }
+    
+    // 0 - stop
+    function anim_stop(msg){
+        write_log('p: '+msg['p']+'/'+msg['a']+' | idle','blue');
+        switch(msg['d']){  // controllo quale direzione viene passata
+            case "n":
+                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-n"]);
+                break;
+            case "e":
+                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-e"]);
+                break;
+            case "s":
+                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-s"]);
+                break;
+            case "w":
+                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-w"]);
+                break;
+            default:
+                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle"]);
+                break;
+        }            	        
+    }
+	
 	
 	function eventsManager(){
 	
-	    if(jQuery.gameQuery.keyTracker[32] && CAN_MOVE){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
+	    if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 	
-		if(jQuery.gameQuery.keyTracker[65] && CAN_MOVE){ //this is left! (a)
+		if(jQuery.gameQuery.keyTracker[65]){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
     	}
-    	else if(jQuery.gameQuery.keyTracker[68] && CAN_MOVE){ //this is right! (d)
+    	else if(jQuery.gameQuery.keyTracker[68]){ //this is right! (d)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[87] && CAN_MOVE){ //this is up! (w)
+		else if(jQuery.gameQuery.keyTracker[87]){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[83] && CAN_MOVE){ //this is down! (s)
+		else if(jQuery.gameQuery.keyTracker[83]){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
@@ -257,121 +361,31 @@ jQuery(function(){
 		
 		while((msg_queue = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
 		
-		        var msg = msg_queue;
-                
-				switch(msg['c']){  // controllo quale comando viene passato
-				    /*case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, a=lista di blocchi dell'arena) 
-				        player_id = msg['p'];
-				        init_arena(player_id,msg['x'],msg['y'],msg['e']);
-				        $("#grid").html(arena(msg['a']));
-				        break;*/
-				    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
-				        write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
-			            if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
-			                write_log('p: '+msg['p']+'/'+msg['a']+' | cambio dir','orange');
-                            switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
-		                        case "n": //north
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_up"]);
-		                            break;
-		                        case "s": //south
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_down"]);
-		                            break;
-		                        case "w": //west
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_left"]);
-		                            break;
-		                        case "e": //east
-                                    $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_right"]);
-		                            break;
-		                    }
-                        }
-                        //in ogni caso sposto il player alle nuove coordinate
-			            $("#player_"+msg['p']).css("left", msg['x']+"px");
-			            $("#player_"+msg['p']).css("top", msg['y']+"px");
-
-				    	break;
-				    	
-				    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
-				    	$.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'],
-			                                width: ACTOR_W, height: ACTOR_H})
-			                          .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
-		                                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-		                         //$("#player_"+msg['p']).html($("#player_"+msg['p']).html()+msg['p']);
-		                         break;
-                    case "k": // k=kill (rimuovi player_id 'p')
-                        var curr_mess = msg
-                        write_log('p: '+curr_mess['p']+'/'+curr_mess['a']+' | inizia morte','red');                        
-                        if(curr_mess['p']==player_id){
-                            CAN_MOVE = false;
-                        }
-                        write_log('p: '+curr_mess['p']+' | pretimeout morte','red');
-                        setTimeout(function(){  //aspetto 200 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
-                                                //bisogna implementare un sistema migliore per sincronizzarli
-                            write_log('p: '+curr_mess['p']+' | posttimeout morte','red');
-                            playerSound["die"].play();
-                            write_log('p: '+curr_mess['p']+' | morendo','red');
-                            $("#playerBody_"+curr_mess['p']).setAnimation(playerAnimation[curr_mess['a']+"_die"], 
-        	    	            function(){
-        	    	                //write_log('p: '+curr_mess['p']+' | morendo','red');
-                                    $("#player_"+curr_mess['p']).remove();
-                                    write_log('p: '+curr_mess['p']+' | morto e rimosso','red');
-                                }
-                            );
-                        }, 200);
-            	        break;
-            	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-                	    var curr_mess = msg
-            	        write_log('p: '+curr_mess['p']+' | lascio la bomba '+'p: '+curr_mess['p'],'red');
-            	        if($("#bomb_"+curr_mess['p']).get()){
-            	            bombSound["drop"].play();
-                	    	$.playground().addGroup("bomb_"+curr_mess['p'], {posx: curr_mess['x'], posy: curr_mess['y'],
-	                                            width: BOMB_W, height: BOMB_H})
-	                                        .addSprite("bombBody_"+msg['p'],{animation: bombAnimation["drop"],
-                                                posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
-                                    bombSound["loop"].play();
-                                    $("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["loop"]);
-                                }});	              
-                         }        
-                         break;
-                    case "x": // x=explosion (esplode la bomba)
-                        var curr_mess = msg
-                        write_log('p: '+curr_mess['p']+' | esplode la bomba '+'p: '+curr_mess['p'],'red');
-                        bombSound["loop"].pause();
-                        bombSound["explode"].play();       
-            	    	$("#bombBody_"+msg['p']).setAnimation(bombAnimation["explode"],           	    	
-            	    	    function(){
-            	    	        write_log('p: '+curr_mess['p']+' | rimuovendo la bomba '+'p: '+curr_mess['p'],'red');
-            	    	        $("#bomb_"+curr_mess['p']).remove();
-            	    	        var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
-                    			ws.send(JSON.stringify(message));
-                    			write_log('send msg: '+JSON.stringify(message),'black',2);
-            	    	        write_log('p: '+curr_mess['p']+' | rimossa la bomba '+'p: '+curr_mess['p'],'red');                                 
-            	    	   }
-            	    	);
-            	    	
-            	    	break;
-            	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
-            	        write_log('p: '+msg['p']+'/'+msg['a']+' | idle','blue');
-            	        switch(msg['d']){  // controllo quale direzione viene passata
-				            case "n":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-n"]);
-				                break;
-				            case "e":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-e"]);
-				                break;
-				            case "s":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-s"]);
-				                break;
-				            case "w":
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle-w"]);
-				                break;
-				            default:
-                                $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_idle"]);
-				                break;
-				        }
-            	    	break;
-				    default:
-				    	break;
-				}
+	        var msg = msg_queue;
+	        write_log('c: '+msg['c']+' - p: '+msg['p']+'/'+msg['a']+' | msg processed','green');  
+            
+			switch(msg['c']){  // controllo quale comando viene passato
+			    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
+			        anim_move(msg);
+			    	break;
+			    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
+			    	anim_add_player(msg);
+	                break;
+                case "k": // k=kill (rimuovi player_id 'p')
+                    anim_kill(msg);
+        	        break;
+        	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
+                    anim_drop_bomb(msg);
+                    break;
+                case "x": // x=explosion (esplode la bomba)
+                    anim_explode(msg);
+        	    	break;
+        	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
+                    anim_stop(msg);
+        	    	break;
+			    default:
+			    	break;
+			}
 		}
 	}
 	
