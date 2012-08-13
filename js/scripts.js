@@ -299,21 +299,24 @@ jQuery(function(){
 		                         break;
                     case "k": // k=kill (rimuovi player_id 'p')
                         var curr_mess = msg
-                        write_log('p: '+curr_mess['p']+'/'+curr_mess['a']+' | muoio','red');                        
+                        write_log('p: '+curr_mess['p']+'/'+curr_mess['a']+' | inizia morte','red');                        
                         if(curr_mess['p']==player_id){
                             CAN_MOVE = false;
                         }
-                        //setTimeout(function(){  //aspetto 100 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
+                        write_log('p: '+curr_mess['p']+' | pretimeout morte','red');
+                        setTimeout(function(){  //aspetto 200 millisec perchè l'azione che arriva all'istante in cui metto CAN_MOVE sfugge al semaforo.
                                                 //bisogna implementare un sistema migliore per sincronizzarli
+                            write_log('p: '+curr_mess['p']+' | posttimeout morte','red');
                             playerSound["die"].play();
+                            write_log('p: '+curr_mess['p']+' | morendo','red');
                             $("#playerBody_"+curr_mess['p']).setAnimation(playerAnimation[curr_mess['a']+"_die"], 
         	    	            function(){
-        	    	                write_log('p: '+curr_mess['p']+' | morendo','red');
+        	    	                //write_log('p: '+curr_mess['p']+' | morendo','red');
                                     $("#player_"+curr_mess['p']).remove();
-                                    write_log('p: '+curr_mess['p']+' | morto','red');
+                                    write_log('p: '+curr_mess['p']+' | morto e rimosso','red');
                                 }
                             );
-                        //}, 200);
+                        }, 200);
             	        break;
             	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
                 	    var curr_mess = msg
