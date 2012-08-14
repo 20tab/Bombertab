@@ -352,6 +352,7 @@ jQuery(function(){
     function anim_explode(curr_mess){
     	write_log('p: '+curr_mess['p']+' | esplode la bomba '+'i: '+curr_mess['i'],'red'); 
         bombSound["loop"].pause();
+        //bombSound["explode"].pause();
         bombSound["explode"].play();       
     	$("#bombBody_"+curr_mess['i']).setAnimation(bombAnimation["explode"],           	    	
     	    function(){
