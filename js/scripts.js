@@ -227,6 +227,7 @@ jQuery(function(){
                       width: ACTOR_W, height: ACTOR_H})
                 .addSprite("playerBody_"+player_id,{animation: playerAnimation[avatar+"_idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+        $('#game_stats').empty();
         $('#game_stats').append('<div class="stats_player" id="stats_p_'+player_id+'"><p>player '+player_id+'</p></div>');
 
         
