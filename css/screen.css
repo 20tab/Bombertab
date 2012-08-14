@@ -1,5 +1,6 @@
 body{
     /*background-color: black;*/
+    font:11px Verdana, sans-serif;
 }
 
 .grid-cell{
@@ -27,6 +28,26 @@ body{
     top:0; left: 0;
     display: none;
     }
+#game_stats{
+    position: absolute;
+    top:550px; left: 0;
+    }
+#game_stats div{
+    float:left;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid;
+}
+div.stats_player{
+    clear: left;
+    margin-right: 10px;
+    color: green;
+    border-color: green;
+}
+div.stats_enemy{
+    color: red;
+    border-color: red;
+}
 #game_over{
     background-color: black;
     position: absolute;
@@ -90,8 +111,9 @@ div.log{
 	color: black;
 	opacity: 0.7;
 	background-color: white;
-	line-height: 70%;
+	line-height: 80%;
 	font-family: Courier;
+	font-size: 15px;
 	letter-spacing: -2px;
 	z-index: 999999;
 }
