@@ -362,25 +362,25 @@ jQuery(function(){
 			send_stop = true;
 		}
 	
-		if(jQuery.gameQuery.keyTracker[65]){ //this is left! (a)
+		if(jQuery.gameQuery.keyTracker[65] || jQuery.gameQuery.keyTracker[37]){ //this is left! (a)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
     	}
-    	else if(jQuery.gameQuery.keyTracker[68]){ //this is right! (d)
-			var message = {'c':'e','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
-			send_stop = true;
-		}
-		else if(jQuery.gameQuery.keyTracker[87]){ //this is up! (w)
+		else if(jQuery.gameQuery.keyTracker[87] || jQuery.gameQuery.keyTracker[38]){ //this is up! (w)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[83]){ //this is down! (s)
+    	else if(jQuery.gameQuery.keyTracker[68] || jQuery.gameQuery.keyTracker[39]){ //this is right! (d)
+			var message = {'c':'e','p':player_id};
+			ws.send(JSON.stringify(message));
+			write_log('send msg: '+JSON.stringify(message),'black',2);
+			send_stop = true;
+		}
+		else if(jQuery.gameQuery.keyTracker[83] || jQuery.gameQuery.keyTracker[40]){ //this is down! (s)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
