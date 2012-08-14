@@ -1,3 +1,38 @@
+/*
+    IN
+        e enemies-list [[p,a,x,y],[...]..]
+        b arena-block-list [0,1,0,1,0,1,0...]
+        p player-id (int)
+        a player-avatar (e v m)
+        x player-pos-x (int)
+        y player-pos-y (int)
+        d player-direction (n s w e)
+        o player-old-direction (n s w e)
+        i bomb-id (int)
+        c cmd:
+            z welcome
+            m move player p in x,y
+            p add player p in x,y
+            k kill player p
+            b drop bomb i in x,y
+            x explode bomb i
+            0 stop player p in x,y
+
+    OUT
+        p player-id (int)
+        a player-avatar
+        c cmd:
+            j join arena with avatar a
+            //r ready-drop-new-bomb
+            b drop bomb
+            w move west
+            e move est
+            n move north
+            s move south
+            0 stop
+*/
+
+
 jQuery(function(){
 	
 	var BORDER_CELL = 0;
@@ -263,34 +298,34 @@ jQuery(function(){
 	
 	// b - drop bomb
     function anim_drop_bomb(curr_mess){
-	    write_log('p: '+curr_mess['p']+' | lascio la bomba '+'p: '+curr_mess['p'],'red');
-        if($("#bomb_"+curr_mess['p']).get()){
-            write_log('p: '+curr_mess['p']+' | inizio sequenza drop '+'p: '+curr_mess['p'],'red');
+	    write_log('p: '+curr_mess['p']+' | lascio la bomba '+'i: '+curr_mess['i'],'red');
+        if($("#bomb_"+curr_mess['i']).get()){
+            write_log('p: '+curr_mess['p']+' | inizio sequenza drop '+'i: '+curr_mess['i'],'red');
             bombSound["drop"].play();
-	    	$.playground().addGroup("bomb_"+curr_mess['p'], {posx: curr_mess['x'], posy: curr_mess['y'],
+	    	$.playground().addGroup("bomb_"+curr_mess['i'], {posx: curr_mess['x'], posy: curr_mess['y'],
                                 width: BOMB_W, height: BOMB_H})
-                            .addSprite("bombBody_"+curr_mess['p'],{animation: bombAnimation["drop"],
+                            .addSprite("bombBody_"+curr_mess['i'],{animation: bombAnimation["drop"],
                                 posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, callback: function(){
-                    write_log('p: '+curr_mess['p']+' | inizio sequenza loop '+'p: '+curr_mess['p'],'red');
+                    write_log('p: '+curr_mess['p']+' | inizio sequenza loop '+'i: '+curr_mess['i'],'red');
                     bombSound["loop"].play();
-                    $("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["loop"]);
+                    $("#bombBody_"+curr_mess['i']).setAnimation(bombAnimation["loop"]);
                 }});	              
         }  
     }
     
     // x - explosion                        
     function anim_explode(curr_mess){
-    	write_log('p: '+curr_mess['p']+' | esplode la bomba '+'p: '+curr_mess['p'],'red'); 
+    	write_log('p: '+curr_mess['p']+' | esplode la bomba '+'i: '+curr_mess['i'],'red'); 
         bombSound["loop"].pause();
         bombSound["explode"].play();       
-    	$("#bombBody_"+curr_mess['p']).setAnimation(bombAnimation["explode"],           	    	
+    	$("#bombBody_"+curr_mess['i']).setAnimation(bombAnimation["explode"],           	    	
     	    function(){
-    	        write_log('p: '+curr_mess['p']+' | rimuovendo la bomba '+'p: '+curr_mess['p'],'red');
-    	        $("#bomb_"+curr_mess['p']).remove();
-    	        var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
+    	        write_log('p: '+curr_mess['p']+' | rimuovendo la bomba '+'i: '+curr_mess['i'],'red');
+    	        $("#bomb_"+curr_mess['i']).remove();
+    	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
     			ws.send(JSON.stringify(message));
-    			write_log('send msg: '+JSON.stringify(message),'black',2);
-    	        write_log('p: '+curr_mess['p']+' | rimossa la bomba '+'p: '+curr_mess['p'],'red');                                 
+    			write_log('send msg: '+JSON.stringify(message),'black',2);*/
+    	        write_log('p: '+curr_mess['p']+' | rimossa la bomba '+'i: '+curr_mess['i'],'red');                                 
     	   }
     	);                       
     }
