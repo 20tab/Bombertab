@@ -52,6 +52,8 @@ jQuery(function(){
 	
 	var avatar = 'e';
 	var player_id = 0;
+	var player_over = false;
+	var game_over = false;
 	var events = Array();
 	
 	
@@ -247,6 +249,18 @@ jQuery(function(){
 	var ws;
 	
  	var send_stop = true;
+ 	
+ 	// player over
+ 	function anim_player_over(){
+ 	    $('#game_over').fadeIn();
+ 	}
+ 	
+    $('#play_again').on('click',function(){
+        player_over = false;
+        ws.send('{"c":"j", "a":"'+avatar+'", "p":"'+player_id+'"}');
+        write_log('p: '+player_id+' | CURRENT PLAYER JOIN AGAIN','green',2);
+        $('#game_over').fadeOut();
+    });
 	
 	
 	// inizializzo le funzioni che rispondono ai vari eventi gestiti da eventsManager, che usero' a seconda del command processato
@@ -259,6 +273,11 @@ jQuery(function(){
                 write_log('p: '+curr_mess['p']+' | rimuovendo','red');
                 $("#player_"+curr_mess['p']).remove();
                 write_log('p: '+curr_mess['p']+' | morto e rimosso','red');
+                if(curr_mess['p'] == player_id){  //player_over
+                    player_over = true;
+                    anim_player_over();
+                    write_log('p: '+curr_mess['p']+' | CURRENT PLAYER GAME OVER','red');
+                }
             }
         );
 
@@ -355,32 +374,32 @@ jQuery(function(){
 	
 	function eventsManager(){
 	
-	    if(jQuery.gameQuery.keyTracker[32]){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
+	    if(jQuery.gameQuery.keyTracker[32] && !player_over){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
 			var message = {'c':'b','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 	
-		if(jQuery.gameQuery.keyTracker[65] || jQuery.gameQuery.keyTracker[37]){ //this is left! (a)
+		if((jQuery.gameQuery.keyTracker[65] || jQuery.gameQuery.keyTracker[37]) && !player_over){ //this is left! (a or arrow-left)
 			var message = {'c':'w','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
     	}
-		else if(jQuery.gameQuery.keyTracker[87] || jQuery.gameQuery.keyTracker[38]){ //this is up! (w)
+		else if((jQuery.gameQuery.keyTracker[87] || jQuery.gameQuery.keyTracker[38]) && !player_over){ //this is up! (w or arrow-up)
 			var message = {'c':'n','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
-    	else if(jQuery.gameQuery.keyTracker[68] || jQuery.gameQuery.keyTracker[39]){ //this is right! (d)
+    	else if((jQuery.gameQuery.keyTracker[68] || jQuery.gameQuery.keyTracker[39]) && !player_over){ //this is right! (d or arrow-right)
 			var message = {'c':'e','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
-		else if(jQuery.gameQuery.keyTracker[83] || jQuery.gameQuery.keyTracker[40]){ //this is down! (s)
+		else if((jQuery.gameQuery.keyTracker[83] || jQuery.gameQuery.keyTracker[40]) && !player_over){ //this is down! (s or arrow-down)
 			var message = {'c':'s','p':player_id};
 			ws.send(JSON.stringify(message));
 			write_log('send msg: '+JSON.stringify(message),'black',2);
@@ -448,6 +467,7 @@ jQuery(function(){
 				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
 				            player_id = msg_in['p'];
 				            avatar = msg_in['a'];
+				            $.playground().clearAll(true);
 				            init_arena(player_id,msg_in['a'],msg_in['x'],msg_in['y'],msg_in['e']);
 				            $("#grid").html(arena(msg_in['b']));
 				            break;
