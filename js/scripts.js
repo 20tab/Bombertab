@@ -17,6 +17,7 @@
             b drop bomb i in x,y
             x explode bomb i
             0 stop player p in x,y
+            v vincitore p
 
     OUT
         p player-id (int)
@@ -106,6 +107,7 @@ jQuery(function(){
 	var playerSound = Array();
 	var bombAnimation = Array();
 	var bombSound = Array();
+	var gameSound = Array();
 	
 	function init_arena(player_id,avatar,pos_x,pos_y,enemies){
 		
@@ -143,6 +145,9 @@ jQuery(function(){
         playerAnimation["e_die"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
+        playerAnimation["e_winner"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/emperor_winner.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
         	
 		playerAnimation["v_idle"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
@@ -173,6 +178,9 @@ jQuery(function(){
         	});
         playerAnimation["v_die"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
+        playerAnimation["v_winner"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/vassal_winner.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
         	
 		playerAnimation["m_idle"] = 	new $.gameQuery.Animation({
@@ -205,6 +213,9 @@ jQuery(function(){
         playerAnimation["m_die"] = 	new $.gameQuery.Animation({
         	imageURL: "img/mule_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
+        playerAnimation["m_winner"] = 	new $.gameQuery.Animation({
+        	imageURL: "img/mule_winner.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	});
         	
 	    bombAnimation["drop"] =	new $.gameQuery.Animation({
         	imageURL: "img/bomb_drop.png", numberOfFrame: 5, delta: 150, rate: 100, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
@@ -219,6 +230,7 @@ jQuery(function(){
         bombSound["drop"] = new Audio("sounds/bomb_drop.mp3");
         bombSound["loop"] = new Audio("sounds/bomb_loop.mp3");
         playerSound["die"] = new Audio("sounds/player_die.mp3");
+        gameSound["winner"] = new Audio("sounds/winner.mp3");
         
                
         
@@ -373,6 +385,23 @@ jQuery(function(){
                 break;
         }            	        
     }
+    
+    // v - winner
+    function anim_winner(msg){
+    	write_log('p: '+msg['p']+' | VITTORIA!','green'); 
+    	$('#game_win').fadeIn();
+        gameSound["winner"].play();
+       
+    	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
+    	    function(){
+                //$.playground().pauseGame();
+                write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+curr_mess['i'],'red');  
+    	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
+    			ws.send(JSON.stringify(message));
+    			write_log('send msg: '+JSON.stringify(message),'black',2);*/
+    	   }
+    	);                       
+    }
 	
 	
 	function eventsManager(){
@@ -440,6 +469,9 @@ jQuery(function(){
         	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
                     anim_stop(msg);
         	    	break;
+        	    case "v": // v=vittoria (vince il player p)
+			        anim_winner(msg);
+			    	break;
 			    default:
 			    	break;
 			}
