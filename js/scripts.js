@@ -388,19 +388,21 @@ jQuery(function(){
     
     // v - winner
     function anim_winner(msg){
-    	write_log('p: '+msg['p']+' | VITTORIA!','green'); 
-    	$('#game_win').fadeIn();
-        gameSound["winner"].play();
-       
-    	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
-    	    function(){
-                //$.playground().pauseGame();
-                write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+curr_mess['i'],'red');  
-    	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
-    			ws.send(JSON.stringify(message));
-    			write_log('send msg: '+JSON.stringify(message),'black',2);*/
-    	   }
-    	);                       
+        if(msg['p']==player_id){
+        	write_log('p: '+msg['p']+' | VITTORIA!','green'); 
+        	$('#game_win').fadeIn();
+            gameSound["winner"].play();
+           
+        	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
+        	    function(){
+                    //$.playground().pauseGame();
+                    write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+curr_mess['i'],'red');  
+        	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
+        			ws.send(JSON.stringify(message));
+        			write_log('send msg: '+JSON.stringify(message),'black',2);*/
+        	   }
+        	);                      
+    	} 
     }
 	
 	
