@@ -331,13 +331,12 @@ jQuery(function(){
     
     // p - add player
 	function anim_add_player(msg){
+        //console.log(msg);
 	    $.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'], width: ACTOR_W, height: ACTOR_H})
              .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-        if(player_id != msg['p']){
-            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+msg['p']+'"><p>'+msg['u']+' ('+msg['p']+')</p></div>');
-            $("<div class='username_box'>"+msg['u']+"</div>").appendTo('#playerBody_'+msg['p']);
-        }
+        $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+msg['p']+'"><p>'+msg['u']+' ('+msg['p']+')</p></div>');
+        $("<div class='username_box'>"+msg['u']+"</div>").appendTo('#playerBody_'+msg['p']);
 	}
 	
 	// b - drop bomb
@@ -459,7 +458,6 @@ jQuery(function(){
 		    ws.send(JSON.stringify(message));
 		    write_log('send msg: '+JSON.stringify(message),'black',2);
 		    send_stop = false;
-		    //alert('mandato STOP da parte di '+player_id);
 		}
 		
 		while((msg_queue = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
