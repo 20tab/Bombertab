@@ -19,7 +19,7 @@ class TremoloApp():
     def __call__(self, environ, start_response):
         uwsgi.websocket_handshake(environ['HTTP_SEC_WEBSOCKET_KEY'], environ.get('HTTP_ORIGIN', ''))
         print "websockets..."
-        self.r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        self.r = redis.StrictRedis(host='127.0.0.30', port=19759, db=0)
         channel = self.r.pubsub()
         channel.subscribe('foobar')
 
