@@ -325,6 +325,10 @@ jQuery(function(){
     
     // p - add player
 	function anim_add_player(msg){
+        if(player_id != msg['p']){
+            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+msg['p']+'"><p>player '+msg['p']+'</p></div>');
+        }
+
 	    $.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'], width: ACTOR_W, height: ACTOR_H})
              .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
