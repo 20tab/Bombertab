@@ -54,6 +54,7 @@ def bomb_task(bomb):
     player.game.broadcast(json.dumps(bomb_msg))
     gevent.sleep(0.4)
     # death check
+    deaths = []
     for p_id in game.players:
         bp = game.players[p_id]
         p_pos = bp.position(bp.x, bp.y+bp.feet)
@@ -62,19 +63,16 @@ def bomb_task(bomb):
             announce = {'c':'k', 'p':bp.id, 'a':bp.avatar, 'u':bp.name}
             bp.x = 0
             bp.y = 0
-            bp.dead = True
             player.game.broadcast(json.dumps(announce))
-            winning = []
-            for p_id in game.players:
-                giocatore = game.players[p_id]
-                if not giocatore.dead:
-                    winning.append(giocatore)
-            if len(winning) == 1:
-                print "VITTORIA"
-                victory = {'c':'v', 'p':winning[0].id, 'a':winning[0].avatar, 'u':winning[0].name}
-                player.game.broadcast(json.dumps(victory))
-                win(winning[0])
-                return
+            deaths.append(bp.id)
+    for id in deaths:
+        del(player.game.players[id])
+    if len(game.players) == 1:
+        winner = game.players[ game.players.keys()[0] ]
+        print "VITTORIA"
+        victory = {'c':'v', 'p':winner.id, 'a':winner.avatar, 'u':winner.name}
+        player.game.broadcast(json.dumps(victory))
+        win(winner)
     gevent.sleep(0.6)
     bomb.destroy()
 
@@ -103,7 +101,6 @@ class BomberPlayer():
         self.old_direction = 's'
         self.real_old_direction = 's'
         self.avatar = avatar
-        self.dead = False
         self.feet = 28
         self.w = 50
         self.h = 70
@@ -315,12 +312,8 @@ class BomberTab(TremoloApp):
         elif msg['c'] == 'J':
             bp = BomberPlayer(self, core_id, msg['a'])
             bp.name = msg['u']
-            lista_giocatori = []
-            for player in self.players.keys():
-                ep = self.players[player]
-                lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
             # broadcast new player presence
-            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y}
+            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y, 'a': bp.avatar, 'u':bp.name}
             self.broadcast(json.dumps(announce))
 
             self.players[core_id] = bp
@@ -331,7 +324,6 @@ class BomberTab(TremoloApp):
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
             bp.recursion = 0
             bp.move_north()
         elif msg['c'] == 's':
@@ -339,7 +331,6 @@ class BomberTab(TremoloApp):
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
             bp.recursion = 0
             bp.move_south()
         elif msg['c'] == 'e':
@@ -347,7 +338,6 @@ class BomberTab(TremoloApp):
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
             bp.recursion = 0
             bp.move_east()
         elif msg['c'] == 'w':
@@ -355,7 +345,6 @@ class BomberTab(TremoloApp):
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
             bp.recursion = 0
             bp.move_west()
         elif msg['c'] == 'b':
@@ -363,21 +352,18 @@ class BomberTab(TremoloApp):
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
             bp.drop_bomb()
         elif msg['c'] == 'r':
             try:
                 bp = self.players[msg['p']] 
             except:
                 return
-            if bp.dead: return
         elif msg['c'] == '0':
             # broadcast stop
             try:
                 player = self.players[msg['p']]
             except:
                 return
-            if player.dead: return
             announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar, 'u':player.name}
             player.direction = '0'
             self.broadcast(json.dumps(announce))
