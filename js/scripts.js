@@ -37,7 +37,8 @@
 
 
 jQuery(function(){
-	
+    var	SOCKET_ADDRESS = "ws://bombertab.20tab.com/";
+
 	var BORDER_CELL = 0;
 	var CELLS_NUMBER_W = 19;
 	var CELLS_NUMBER_H = 11;
@@ -506,8 +507,7 @@ jQuery(function(){
 	    $('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
 	    
 		$.playground().startGame(function(){
-			ws = new WebSocket("ws://ubuntu64.local:9091/");
-			//ws = new WebSocket("ws://192.168.2.1:8080");
+			ws = new WebSocket(SOCKET_ADDRESS);
 			ws.onopen = function() {
 			        ws.send('{"c":"j", "a":"'+avatar+'", "u":"'+username+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
 			};
