@@ -28,7 +28,10 @@ def win(player):
     for p in game.players:
         lista_giocatori.append(p)
     for p in lista_giocatori:
-        del(game.players[p])
+        try:
+            del(game.players[p])
+        except:
+            pass
 
 def bomb_task(bomb):
     player = bomb.player
@@ -93,7 +96,7 @@ class BomberBomb():
 class BomberPlayer():
 
     def __init__(self, game, core_id, avatar):
-        self.id = game.pc
+        self.id = core_id
         self.game = game
         self.pos = 0
         self.direction = 's'
@@ -159,7 +162,7 @@ class BomberPlayer():
             self.real_old_direction = self.direction
             self.redraw()
         else:
-            print self.real_old_direction
+            #print self.real_old_direction
             if self.real_old_direction == 'e':
                 self.move_east()
             elif self.real_old_direction == 'w':
@@ -176,7 +179,7 @@ class BomberPlayer():
             self.real_old_direction = self.direction
             self.redraw()
         else:
-            print self.real_old_direction
+            #print self.real_old_direction
             if self.real_old_direction == 'e':
                 self.move_east()
             elif self.real_old_direction == 'w':
@@ -236,7 +239,7 @@ class BomberPlayer():
             self.real_old_direction = self.direction
             self.redraw()
         else:
-            print self.real_old_direction
+            #print self.real_old_direction
             if self.real_old_direction == 'n':
                 self.move_north()
             elif self.real_old_direction == 's':
@@ -253,7 +256,7 @@ class BomberPlayer():
             self.real_old_direction = self.direction
             self.redraw()
         else:
-            print self.real_old_direction
+            #print self.real_old_direction
             if self.real_old_direction == 'n':
                 self.move_north()
             elif self.real_old_direction == 's':
@@ -268,7 +271,6 @@ class BomberTab(TremoloApp):
 
     players = {}
     arena = bomber_arena
-    pc = 0
     bomb_id = 0
     arena_block = 50
     arena_block_w = 19
@@ -281,14 +283,17 @@ class BomberTab(TremoloApp):
         print "player %d disconnected" % core_id
         announce = {'c':'k', 'p':core_id}
         self.broadcast(json.dumps(announce))
+        try:
+            del(self.players[core_id])
+        except:
+            pass
 
     def websocket(self, core_id, js):
         msg = json.loads(js) 
         if msg['c'] == 'j':
-            self.pc += 1
             bp = BomberPlayer(self, core_id, msg['a'])
             lista_giocatori = []
-            for player in self.players:
+            for player in self.players.keys():
                 ep = self.players[player]
                 lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
 
@@ -298,40 +303,61 @@ class BomberTab(TremoloApp):
             announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y}
             self.broadcast(json.dumps(announce))
 
-            self.players[self.pc] = bp
+            self.players[core_id] = bp
             # join the game
-            print "new player", self.pc
+            print "new player", core_id
             return
         elif msg['c'] == 'n':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
             bp.recursion = 0
             bp.move_north()
         elif msg['c'] == 's':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
             bp.recursion = 0
             bp.move_south()
         elif msg['c'] == 'e':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
             bp.recursion = 0
             bp.move_east()
         elif msg['c'] == 'w':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
             bp.recursion = 0
             bp.move_west()
         elif msg['c'] == 'b':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
             bp.drop_bomb()
         elif msg['c'] == 'r':
-            bp = self.players[msg['p']] 
+            try:
+                bp = self.players[msg['p']] 
+            except:
+                return
             if bp.dead: return
         elif msg['c'] == '0':
             # broadcast stop
-            player = self.players[msg['p']]
+            try:
+                player = self.players[msg['p']]
+            except:
+                return
             if player.dead: return
             announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar}
             player.direction = '0'
