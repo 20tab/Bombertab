@@ -250,7 +250,6 @@ jQuery(function(){
         
         // adding enemies
         for(i in enemies){
-            alert(enemies[i][0]);
         	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][2], posy: enemies[i][3],
                       width: ACTOR_W, height: ACTOR_H})
                   .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation[enemies[i][1]+"_idle"],
@@ -409,7 +408,11 @@ jQuery(function(){
     	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
     	    function(){
                 //$.playground().pauseGame();
-                write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+curr_mess['i'],'red');  
+                write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+msg['i'],'red');  
+                write_log('p: '+msg['p']+' | rimuovendo dopo vittoria','red');
+                $("#player_"+msg['p']).remove();
+                write_log('p: '+msg['p']+' | vincitore rimosso','red');
+
     	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
     			ws.send(JSON.stringify(message));
     			write_log('send msg: '+JSON.stringify(message),'black',2);*/
