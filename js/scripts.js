@@ -4,6 +4,7 @@
         b arena-block-list [0,1,0,1,0,1,0...]
         p player-id (int)
         a player-avatar (e v m)
+        u player-username (string)
         x player-pos-x (int)
         y player-pos-y (int)
         d player-direction (n s w e)
@@ -21,7 +22,8 @@
 
     OUT
         p player-id (int)
-        a player-avatar
+        a player-avatar (e v m)
+        u player-username
         c cmd:
             j join arena with avatar a
             //r ready-drop-new-bomb
@@ -52,6 +54,7 @@ jQuery(function(){
 	var RATE = 60;
 	
 	var avatar = 'e';
+    var username = '';
 	var player_id = 0;
 	var player_over = false;
 	var game_over = false;
@@ -109,7 +112,7 @@ jQuery(function(){
 	var bombSound = Array();
 	var gameSound = Array();
 	
-	function init_arena(player_id,avatar,pos_x,pos_y,enemies){
+	function init_arena(player_id,username,avatar,pos_x,pos_y,enemies){
 		
 		// inizializzo la griglia con la sprite  da usare
 		$.playground().addSprite('grid',{height: PG_H, width: PG_W}).end();
@@ -239,8 +242,9 @@ jQuery(function(){
                       width: ACTOR_W, height: ACTOR_H})
                 .addSprite("playerBody_"+player_id,{animation: playerAnimation[avatar+"_idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+                $("<div class='username_box'>"+username+"</div>").appendTo('#playerBody_'+player_id);
         $('#game_stats').empty();
-        $('#game_stats').append('<div class="stats_player" id="stats_p_'+player_id+'"><p>player '+player_id+'</p></div>');
+        $('#game_stats').append('<div class="stats_player" id="stats_p_'+player_id+'"><p>'+username+'('+player_id+')</p></div>');
 
         
         // adding enemies
@@ -249,7 +253,8 @@ jQuery(function(){
                       width: ACTOR_W, height: ACTOR_H})
                   .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation[enemies[i][1]+"_idle"],
                       posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+enemies[i][0]+'"><p>player '+enemies[i][0]+'</p></div>');
+                  $("<div class='username_box'>"+enemies[i][4]+"</div>").appendTo('#playerBody_'+enemies[i][0]);
+            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+enemies[i][0]+'"><p>'+enemies[i][4]+'('+enemies[i][0]+')</p></div>');
         }
 		
         $.playground().registerCallback(eventsManager, RATE);
@@ -325,13 +330,13 @@ jQuery(function(){
     
     // p - add player
 	function anim_add_player(msg){
-        if(player_id != msg['p']){
-            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+msg['p']+'"><p>player '+msg['p']+'</p></div>');
-        }
-
 	    $.playground().addGroup("player_"+msg['p'], {posx: msg['x'], posy: msg['y'], width: ACTOR_W, height: ACTOR_H})
              .addSprite("playerBody_"+msg['p'],{animation: playerAnimation[msg['a']+"_idle"],
                    posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
+        if(player_id != msg['p']){
+            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+msg['p']+'"><p>'+msg['u']+' ('+msg['p']+')</p></div>');
+            $("<div class='username_box'>"+msg['u']+"</div>").appendTo('#playerBody_'+msg['p']);
+        }
 	}
 	
 	// b - drop bomb
@@ -488,6 +493,11 @@ jQuery(function(){
 
 	
 	$('.choose_player').on('click',function(){
+      var username_input = $('#username_input').val();
+      if(username_input == ''){
+        $('#username_input').css('border', '2px red solid');
+      }else{
+        username = username_input;
 	    //$('#startGame').html();
 	    
 	    avatar = $(this).data('avatar');
@@ -499,7 +509,7 @@ jQuery(function(){
 			ws = new WebSocket("ws://ubuntu64.local:9091/");
 			//ws = new WebSocket("ws://192.168.2.1:8080");
 			ws.onopen = function() {
-			        ws.send('{"c":"j", "a":"'+avatar+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
+			        ws.send('{"c":"j", "a":"'+avatar+'", "u":"'+username+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
 			};
 			
 			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
@@ -510,7 +520,7 @@ jQuery(function(){
 				            player_id = msg_in['p'];
 				            avatar = msg_in['a'];
 				            $.playground().clearAll(true);
-				            init_arena(player_id,msg_in['a'],msg_in['x'],msg_in['y'],msg_in['e']);
+				            init_arena(player_id,username,msg_in['a'],msg_in['x'],msg_in['y'],msg_in['e']);
 				            $("#grid").html(arena(msg_in['b']));
 				            break;
 				        default: // tutti gli altri li accodi
@@ -524,11 +534,10 @@ jQuery(function(){
                 $.playground().clearAll(true);
 				alert("Connection is closed..."); 
 			};
-			
-		});
-	});
-	
-});
+		}); /*startgame*/
+      }/*endif*/
+	}); /*choose_player onclick*/
+}); /*jQuery*/
 
 
 
