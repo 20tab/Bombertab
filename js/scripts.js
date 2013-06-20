@@ -37,7 +37,7 @@
 
 
 jQuery(function(){
-    var	SOCKET_ADDRESS = "ws://bombertab.20tab.com/";
+    var	SOCKET_ADDRESS = "ws://bombertab.20tab.com/tremolo";
 
 	var BORDER_CELL = 0;
 	var CELLS_NUMBER_W = 19;
