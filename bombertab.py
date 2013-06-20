@@ -92,7 +92,7 @@ class BomberBomb():
 
 class BomberPlayer():
 
-    def __init__(self, game, session, avatar):
+    def __init__(self, game, core_id, avatar):
         self.id = game.pc
         self.game = game
         self.pos = 0
@@ -110,7 +110,6 @@ class BomberPlayer():
         self.bombs_dropped = 0
         self.speed = 7
         self.recursion = 0
-        self.session = session
 
     def position(self, x, y):
         x1 = x/self.game.arena_block
@@ -278,17 +277,16 @@ class BomberTab(TremoloApp):
     arena_h = arena_block_h * arena_block
     bombs = []
 
-    def end(self, session):
-        print "il giocatore %d si e' disconnesso" % session.player.id
-        announce = {'c':'k', 'p':session.player.id}
+    def end(self, core_id):
+        print "player %d disconnected" % core_id
+        announce = {'c':'k', 'p':core_id}
         self.broadcast(json.dumps(announce))
 
-    def websocket(self, session, js):
+    def websocket(self, core_id, js):
         msg = json.loads(js) 
         if msg['c'] == 'j':
             self.pc += 1
-            bp = BomberPlayer(self, session, msg['a'])
-            session.player = bp
+            bp = BomberPlayer(self, core_id, msg['a'])
             lista_giocatori = []
             for player in self.players:
                 ep = self.players[player]
@@ -302,7 +300,6 @@ class BomberTab(TremoloApp):
 
             self.players[self.pc] = bp
             # join the game
-            #session.join(self.group)
             print "new player", self.pc
             return
         elif msg['c'] == 'n':
@@ -340,6 +337,5 @@ class BomberTab(TremoloApp):
             player.direction = '0'
             self.broadcast(json.dumps(announce))
         #print msg
-           
 
-application = BomberTab(BomberSession)
+application = BomberTab()
