@@ -250,6 +250,7 @@ jQuery(function(){
         
         // adding enemies
         for(i in enemies){
+            alert(enemies[i][0]);
         	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][2], posy: enemies[i][3],
                       width: ACTOR_W, height: ACTOR_H})
                   .addSprite("playerBody_"+enemies[i][0],{animation: playerAnimation[enemies[i][1]+"_idle"],
