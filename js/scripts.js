@@ -65,15 +65,10 @@ jQuery(function(){
 	
 	
 	/* log */
-
 	var DEBUG = false;
-
     $('#debug_button input').click(function(){
         DEBUG = $(this).is(":checked");
     });
-
-
-	
 	var last_log = [new Date(),new Date(),new Date()];
 	function write_log(str, color, table){
 	    if(DEBUG){
@@ -88,9 +83,7 @@ jQuery(function(){
 	        last_log[table] = d;
 	    }
 	}
-	
 	/* /log */
-	
 	
 	
 	function arena(grid){
