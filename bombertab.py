@@ -68,7 +68,7 @@ def bomb_task(bomb):
     for id in deaths:
         del(player.game.players[id])
     if len(game.players) == 1:
-        winner = game.players[0]
+        winner = game.players[ game.players.keys()[0] ]
         print "VITTORIA"
         victory = {'c':'v', 'p':winner.id, 'a':winner.avatar, 'u':winner.name}
         player.game.broadcast(json.dumps(victory))
