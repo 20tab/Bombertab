@@ -59,7 +59,7 @@ def bomb_task(bomb):
         p_pos = bp.position(bp.x, bp.y+bp.feet)
         #print p_pos
         if p_pos in detonation_positions:
-            announce = {'c':'k', 'p':bp.id, 'a':bp.avatar}
+            announce = {'c':'k', 'p':bp.id, 'a':bp.avatar, 'u':bp.name}
             bp.x = 0
             bp.y = 0
             bp.dead = True
@@ -71,7 +71,7 @@ def bomb_task(bomb):
                     winning.append(giocatore)
             if len(winning) == 1:
                 print "VITTORIA"
-                victory = {'c':'v', 'p':winning[0].id, 'a':winning[0].avatar}
+                victory = {'c':'v', 'p':winning[0].id, 'a':winning[0].avatar, 'u':winning[0].name}
                 player.game.broadcast(json.dumps(victory))
                 win(winning[0])
                 return
@@ -292,15 +292,16 @@ class BomberTab(TremoloApp):
         msg = json.loads(js) 
         if msg['c'] == 'j':
             bp = BomberPlayer(self, core_id, msg['a'])
+            bp.name = msg['u']
             lista_giocatori = []
             for player in self.players.keys():
                 ep = self.players[player]
-                lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
+                lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y, ep.name])
 
-            response = {'c': 'z', 'p':bp.id, 'b': self.arena, 'e': lista_giocatori, 'x':bp.x, 'y':bp.y, 'a': bp.avatar}
+            response = {'c': 'z', 'p':bp.id, 'b': self.arena, 'e': lista_giocatori, 'x':bp.x, 'y':bp.y, 'a': bp.avatar, 'u':bp.name}
             self.send(json.dumps(response))
             # broadcast new player presence
-            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y}
+            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y, 'u':bp.name}
             self.broadcast(json.dumps(announce))
 
             self.players[core_id] = bp
@@ -359,7 +360,7 @@ class BomberTab(TremoloApp):
             except:
                 return
             if player.dead: return
-            announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar}
+            announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar, 'u':player.name}
             player.direction = '0'
             self.broadcast(json.dumps(announce))
         #print msg
