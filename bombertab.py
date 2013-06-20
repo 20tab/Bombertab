@@ -305,7 +305,7 @@ class BomberTab(TremoloApp):
             response = {'c': 'z', 'p':bp.id, 'b': self.arena, 'e': lista_giocatori, 'x':bp.x, 'y':bp.y, 'a': bp.avatar, 'u':bp.name}
             self.send(json.dumps(response))
             # broadcast new player presence
-            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y, 'u':bp.name}
+            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y, 'a': bp.avatar, 'u':bp.name}
             self.broadcast(json.dumps(announce))
 
             self.players[core_id] = bp
