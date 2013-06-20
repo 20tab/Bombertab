@@ -279,7 +279,7 @@ jQuery(function(){
  	
     $('#play_again').on('click',function(){
         player_over = false;
-        ws.send('{"c":"j", "a":"'+avatar+'", "u":'+username+', "p":"'+player_id+'"}');
+        ws.send('{"c":"j", "a":"'+avatar+'", "u":"'+username+'", "p":"'+player_id+'"}');
         write_log('p: '+player_id+' | CURRENT PLAYER JOIN AGAIN','green',2);
         $('#game_over').fadeOut();
     });
