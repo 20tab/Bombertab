@@ -180,7 +180,7 @@ jQuery(function(){
         	imageURL: "img/vassal_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
         playerAnimation["v_winner"] = 	new $.gameQuery.Animation({
-        	imageURL: "img/vassal_winner.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	imageURL: "img/vassal_winner.png", numberOfFrame: 28, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
         	
 		playerAnimation["m_idle"] = 	new $.gameQuery.Animation({
@@ -243,7 +243,7 @@ jQuery(function(){
         $('#game_stats').append('<div class="stats_player" id="stats_p_'+player_id+'"><p>player '+player_id+'</p></div>');
 
         
-        // aggiungo i nemici
+        // adding enemies
         for(i in enemies){
         	$.playground().addGroup("player_"+enemies[i][0], {posx: enemies[i][2], posy: enemies[i][3],
                       width: ACTOR_W, height: ACTOR_H})
@@ -278,8 +278,7 @@ jQuery(function(){
         $('#game_over').fadeOut();
     });
 	
-	
-	// inizializzo le funzioni che rispondono ai vari eventi gestiti da eventsManager, che usero' a seconda del command processato
+	// initialize functions that respond to events managed by eventsManager, that will be used according to the processed command 
 	// k - kill
 	function anim_kill(curr_mess){                   
         playerSound["die"].play();
@@ -302,9 +301,9 @@ jQuery(function(){
     // m - move
     function anim_move(msg){
         write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
-        if(msg['d'] != msg['o']){   //se cambio direzione rispetto al frame precedente
+        if(msg['d'] != msg['o']){   //changing direction compared to previous frame
             write_log('p: '+msg['p']+'/'+msg['a']+' | cambio dir','orange');
-            switch(msg['d']){ //controllo la direzione nuova e imposto la nuova animation
+            switch(msg['d']){ //checking new direction and setting new animation
                 case "n": //north
                     $("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_up"]);
                     break;
@@ -493,7 +492,7 @@ jQuery(function(){
 	    $('#playground').playground({height: PG_H, width: PG_W, keyTracker: true})
 	    
 		$.playground().startGame(function(){
-			ws = new WebSocket("wss://blastbeat.unbit.it/bombertab");
+			ws = new WebSocket("ws://ubuntu64.local:9091/");
 			//ws = new WebSocket("ws://192.168.2.1:8080");
 			ws.onopen = function() {
 			        ws.send('{"c":"j", "a":"'+avatar+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
@@ -518,6 +517,7 @@ jQuery(function(){
 			};			        
 
 			ws.onclose = function() {
+                $.playground().clearAll(true);
 				alert("Connection is closed..."); 
 			};
 			
