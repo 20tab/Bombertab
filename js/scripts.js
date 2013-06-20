@@ -65,7 +65,7 @@ jQuery(function(){
 	
 	/* log */
 	
-	var DEBUG = true;
+	var DEBUG = false;
 	
 	var last_log = [new Date(),new Date(),new Date()];
 	function write_log(str, color, table){
