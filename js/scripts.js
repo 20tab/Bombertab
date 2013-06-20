@@ -293,6 +293,7 @@ jQuery(function(){
             function(){
                 write_log('p: '+curr_mess['p']+' | rimuovendo','red');
                 $("#player_"+curr_mess['p']).remove();
+                $("#stats_p_"+curr_mess['p']).remove();
                 write_log('p: '+curr_mess['p']+' | morto e rimosso','red');
                 if(curr_mess['p'] == player_id){  //player_over
                     player_over = true;
@@ -398,26 +399,26 @@ jQuery(function(){
     
     // v - winner
     function anim_winner(msg){
-        write_log('p: '+msg['p']+' | VITTORIA!','green'); 
+        if(msg['p']==player_id){
+            $('#game_over h2').removeClass().addClass('winner').html('WINNER');
+        	$('#game_over').fadeIn();
+            gameSound["winner"].play();                   
+    	} 
+	    write_log('p: '+msg['p']+' | VITTORIA!','green'); 
     	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
     	    function(){
                 //$.playground().pauseGame();
                 write_log('p: '+msg['p']+' | FINE GIOCO '+'i: '+msg['i'],'red');  
                 write_log('p: '+msg['p']+' | rimuovendo dopo vittoria','red');
                 $("#player_"+msg['p']).remove();
+                $("#stats_p_"+msg['p']).remove();
                 write_log('p: '+msg['p']+' | vincitore rimosso','red');
 
     	        /*var message = {'c':'r','p':curr_mess['p']};  //comando r (giocatore ready a mettere un'altra bomba) sulla bomba p
     			ws.send(JSON.stringify(message));
     			write_log('send msg: '+JSON.stringify(message),'black',2);*/
     	   }
-    	);
-        if(msg['p']==player_id){
-            $('#game_over h2').removeClass().addClass('winner').html('WINNER');
-        	$('#game_over').fadeIn();
-            gameSound["winner"].play();                   
-    	} 
-
+    	); 
     }
 	
 	
