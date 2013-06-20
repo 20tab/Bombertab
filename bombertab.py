@@ -281,7 +281,11 @@ class BomberTab(TremoloApp):
 
     def end(self, core_id):
         print "player %d disconnected" % core_id
-        announce = {'c':'k', 'p':core_id}
+        try:
+            bp = self.players[core_id]
+        except:
+            return
+        announce = {'c':'k', 'p':core_id, 'a':bp.avatar, 'u':bp.name}
         self.broadcast(json.dumps(announce))
         try:
             del(self.players[core_id])
