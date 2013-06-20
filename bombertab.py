@@ -54,6 +54,7 @@ def bomb_task(bomb):
     player.game.broadcast(json.dumps(bomb_msg))
     gevent.sleep(0.4)
     # death check
+    deaths = []
     for p_id in game.players:
         bp = game.players[p_id]
         p_pos = bp.position(bp.x, bp.y+bp.feet)
@@ -63,14 +64,15 @@ def bomb_task(bomb):
             bp.x = 0
             bp.y = 0
             player.game.broadcast(json.dumps(announce))
-            del(player.game.players[bp.id])
-            if len(game.players) == 1:
-                winner = game.players[0]
-                print "VITTORIA"
-                victory = {'c':'v', 'p':winner.id, 'a':winner.avatar, 'u':winner.name}
-                player.game.broadcast(json.dumps(victory))
-                win(winner)
-                return
+            deaths.append(bp.id)
+    for id in deaths:
+        del(player.game.players[id])
+    if len(game.players) == 1:
+        winner = game.players[0]
+        print "VITTORIA"
+        victory = {'c':'v', 'p':winner.id, 'a':winner.avatar, 'u':winner.name}
+        player.game.broadcast(json.dumps(victory))
+        win(winner)
     gevent.sleep(0.6)
     bomb.destroy()
 
