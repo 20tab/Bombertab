@@ -28,9 +28,16 @@ body{
     top:0; left: 0;
     display: none;
     }
+#debug_button{
+    position: absolute;
+    text-align: center;
+    top:550px; left: 0;
+    }
+
 #game_stats{
     position: absolute;
-    top:550px; left: 0;
+    top:550px; left: 30px;
+    border: 1px black solid;
     }
 #game_stats div{
     float:left;
