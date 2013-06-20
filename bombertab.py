@@ -310,6 +310,7 @@ class BomberTab(TremoloApp):
             return
         elif msg['c'] == 'J':
             bp = BomberPlayer(self, core_id, msg['a'])
+            bp.name = msg['u']
             lista_giocatori = []
             for player in self.players.keys():
                 ep = self.players[player]
