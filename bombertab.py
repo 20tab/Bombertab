@@ -308,6 +308,19 @@ class BomberTab(TremoloApp):
             # join the game
             print "new player", core_id
             return
+        elif msg['c'] == 'J':
+            bp = BomberPlayer(self, core_id, msg['a'])
+            lista_giocatori = []
+            for player in self.players.keys():
+                ep = self.players[player]
+                lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
+            # broadcast new player presence
+            announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y}
+            self.broadcast(json.dumps(announce))
+
+            self.players[core_id] = bp
+            # join the game
+            print "player replay", core_id
         elif msg['c'] == 'n':
             try:
                 bp = self.players[msg['p']] 
