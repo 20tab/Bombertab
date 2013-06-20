@@ -315,10 +315,6 @@ class BomberTab(TremoloApp):
         elif msg['c'] == 'J':
             bp = BomberPlayer(self, core_id, msg['a'])
             bp.name = msg['u']
-            lista_giocatori = []
-            for player in self.players.keys():
-                ep = self.players[player]
-                lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
             # broadcast new player presence
             announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y, 'a': bp.avatar, 'u':bp.name}
             self.broadcast(json.dumps(announce))
