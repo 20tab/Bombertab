@@ -119,6 +119,9 @@ h2.winner{
     position: absolute;
     top: 520px; left: 215px;
     width: 100px;
+    background-color:transparent;
+    color:white;
+    text-align: center;
     /*opacity: 0.4;*/
 }
 #select_player img{
