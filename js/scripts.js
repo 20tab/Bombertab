@@ -398,12 +398,7 @@ jQuery(function(){
     
     // v - winner
     function anim_winner(msg){
-        if(msg['p']==player_id){
-            $('#game_over h2').removeClass().addClass('winner').html('WINNER');
-        	$('#game_over').fadeIn();
-            gameSound["winner"].play();                   
-    	} 
-	    write_log('p: '+msg['p']+' | VITTORIA!','green'); 
+        write_log('p: '+msg['p']+' | VITTORIA!','green'); 
     	$("#playerBody_"+msg['p']).setAnimation(playerAnimation[msg['a']+"_winner"],           	    	
     	    function(){
                 //$.playground().pauseGame();
@@ -416,7 +411,13 @@ jQuery(function(){
     			ws.send(JSON.stringify(message));
     			write_log('send msg: '+JSON.stringify(message),'black',2);*/
     	   }
-    	); 
+    	);
+        if(msg['p']==player_id){
+            $('#game_over h2').removeClass().addClass('winner').html('WINNER');
+        	$('#game_over').fadeIn();
+            gameSound["winner"].play();                   
+    	} 
+
     }
 	
 	
