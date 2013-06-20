@@ -23,6 +23,14 @@ body{
 	width:100%;
 }
 
+.username_box{
+    width: 50px;
+    color: white;
+    text-align:center;
+    height: 15px;
+    overflow:hidden;
+}
+
 #playground{
     position: absolute;
     top:0; left: 0;
@@ -105,6 +113,12 @@ h2.winner{
     position: absolute;
     top: 300px; left: 160px;
     width: 80px;
+    /*opacity: 0.4;*/
+}
+#username_input{
+    position: absolute;
+    top: 520px; left: 215px;
+    width: 100px;
     /*opacity: 0.4;*/
 }
 #select_player img{
