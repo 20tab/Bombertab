@@ -237,7 +237,7 @@ jQuery(function(){
         gameSound["winner"] = new Audio("sounds/winner.mp3");
         
                
-        
+/*        
 		$.playground().addGroup("actors", {width: PG_W, height: PG_H}).end()
                 .addGroup("player_"+player_id, {posx: pos_x, posy: pos_y,
                       width: ACTOR_W, height: ACTOR_H})
@@ -246,7 +246,7 @@ jQuery(function(){
                 $("<div class='username_box'>"+username+"</div>").appendTo('#playerBody_'+player_id);
         $('#game_stats').empty();
         $('#game_stats').append('<div class="stats_player" id="stats_p_'+player_id+'"><p>'+username+'('+player_id+')</p></div>');
-
+*/
         
         // adding enemies
         for(i in enemies){
@@ -304,7 +304,7 @@ jQuery(function(){
 
     }
     
-    // m - move
+    // m: - move
     function anim_move(msg){
         write_log('p: '+msg['p']+'/'+msg['a']+' | d: '+msg['d']+" - o: "+msg['o']);
         if(msg['d'] != msg['o']){   //changing direction compared to previous frame
