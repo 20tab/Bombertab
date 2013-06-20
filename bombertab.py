@@ -2,6 +2,9 @@ from tremolo import TremoloApp
 import simplejson as json
 import gevent
 
+class BomberSession:
+    pass
+
 bomber_arena = [
    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
    1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,
@@ -42,11 +45,11 @@ def bomb_task(bomb):
         detonation_positions.append(pos-1)
     if pos_x < (game.arena_block_w -1):
         detonation_positions.append(pos+1)
-    player.session.sleep(3)
+    gevent.sleep(3)
     print "EXPLODE !!!!"
     bomb_msg = {'c':'x', 'p':player.id, 'i':bomb.id}
-    player.session.send('%s:websocket' % game.group, json.dumps(bomb_msg))
-    player.session.sleep(0.4)
+    player.game.broadcast(json.dumps(bomb_msg))
+    gevent.sleep(0.4)
     # death check
     for p_id in game.players:
         bp = game.players[p_id]
@@ -57,7 +60,7 @@ def bomb_task(bomb):
             bp.x = 0
             bp.y = 0
             bp.dead = True
-            player.session.send('%s:websocket' % game.group, json.dumps(announce))
+            player.game.broadcast(json.dumps(announce))
             winning = []
             for p_id in game.players:
                 giocatore = game.players[p_id]
@@ -66,10 +69,10 @@ def bomb_task(bomb):
             if len(winning) == 1:
                 print "VITTORIA"
                 victory = {'c':'v', 'p':winning[0].id, 'a':winning[0].avatar}
-                player.session.send('%s:websocket' % game.group, json.dumps(victory))
+                player.game.broadcast(json.dumps(victory))
                 win(winning[0])
                 return
-    player.session.sleep(0.6)
+    gevent.sleep(0.6)
     bomb.destroy()
 
 class BomberBomb():
@@ -144,7 +147,7 @@ class BomberPlayer():
 	bomb = {'c':'b', 'p':self.id, 'i':self.game.bomb_id, 'x':self.bomb_x, 'y':self.bomb_y}
         new_bomb = BomberBomb(self, pos)
         self.game.bombs.append(new_bomb)
-        self.session.send('%s:websocket' % self.game.group, json.dumps(bomb))
+        self.game.broadcast(json.dumps(bomb))
 
     def move_north(self):
         self.recursion += 1
@@ -260,7 +263,7 @@ class BomberPlayer():
     def redraw(self):
         msg = {'c':'m', 'p':self.id, 'a':self.avatar, 'x':self.x, 'y':self.y, 'd':self.direction, 'o':self.old_direction}
         #print self.x,self.y
-        self.session.send('%s:websocket' % self.game.group, json.dumps(msg))
+        self.game.broadcast(json.dumps(msg))
 
 class BomberTab(TremoloApp):
 
@@ -276,13 +279,9 @@ class BomberTab(TremoloApp):
     bombs = []
 
     def end(self, session):
-        try:
-            print "il giocatore %d si e' disconnesso" % session.player.id
-            announce = {'c':'k', 'p':session.player.id}
-            session.send('%s:websocket' % self.group, json.dumps(announce))
-            del(self.players[session.player.id]) 
-        except:
-            pass
+        print "il giocatore %d si e' disconnesso" % session.player.id
+        announce = {'c':'k', 'p':session.player.id}
+        self.broadcast(json.dumps(announce))
 
     def websocket(self, session, js):
         msg = json.loads(js) 
@@ -296,14 +295,14 @@ class BomberTab(TremoloApp):
                 lista_giocatori.append([ep.id, ep.avatar, ep.x, ep.y])
 
             response = {'c': 'z', 'p':bp.id, 'b': self.arena, 'e': lista_giocatori, 'x':bp.x, 'y':bp.y, 'a': bp.avatar}
-            session.send('websocket', json.dumps(response))
+            self.send(json.dumps(response))
             # broadcast new player presence
             announce = {'c':'p', 'p':bp.id, 'x':bp.x, 'y':bp.y}
-            session.send('%s:websocket' % self.group, json.dumps(announce))
+            self.broadcast(json.dumps(announce))
 
             self.players[self.pc] = bp
             # join the game
-            session.join(self.group)
+            #session.join(self.group)
             print "new player", self.pc
             return
         elif msg['c'] == 'n':
@@ -339,10 +338,8 @@ class BomberTab(TremoloApp):
             if player.dead: return
             announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar}
             player.direction = '0'
-            session.send('%s:websocket' % self.group, json.dumps(announce))
+            self.broadcast(json.dumps(announce))
         #print msg
            
 
-app = BomberTab('tcp://192.168.0.6:5000', 'blast1')
-app.group = 'arena001'
-app.run()
+application = BomberTab(BomberSession)
