@@ -66,7 +66,10 @@ def bomb_task(bomb):
             player.game.broadcast(json.dumps(announce))
             deaths.append(bp.id)
     for id in deaths:
-        del(player.game.players[id])
+        try:
+            del(player.game.players[id])
+        except:
+            pass
     if len(game.players) == 1:
         winner = game.players[ game.players.keys()[0] ]
         print "VITTORIA"
