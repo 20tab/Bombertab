@@ -7,7 +7,7 @@
 <meta name="keywords" content="" />
 <meta name="description" content="" />
 <meta name="author" content="20tab srl - info@20tab.com" />
-<link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="./favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
 <link rel="stylesheet" type="text/css" href="css/screen.css" />
 <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
@@ -17,9 +17,25 @@
 
 <body>
 	
-	<button id="startGame">Start game</button>
+	<div id="log_0" class='log' title="log screen"></div>
+	<div id="log_1" class='log' title="log in"></div>
+	<div id="log_2" class='log' title="log out"></div>
+	
+	<div id="select_player">
+	    <img id="emperor_player" data-avatar="e" class="choose_player" src="img/emperor_player.png" alt="emperor" title="emperor" />
+	    <img id="vassal_player" data-avatar="v" class="choose_player" src="img/vassal_player.png" alt="vassal" title="vassal" />
+	    <img id="mule_player" data-avatar="m" class="choose_player" src="img/mule_player.png" alt="mule" title="mule" />
+	</div> <!-- /select_player -->
+	
+	<div id="game_over">
+	    <h2></h2>
+	    <h3 id="play_again">play again</h3>
+	</div>
 	
 	<div id="playground">
+	</div>
+	
+	<div id="game_stats">
 	</div>
 	
 	

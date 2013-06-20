@@ -1,3 +1,8 @@
+body{
+    /*background-color: black;*/
+    font:11px Verdana, sans-serif;
+}
+
 .grid-cell{
 	border:0px solid gray;
 	float:left;
@@ -17,3 +22,106 @@
 	height:0px;
 	width:100%;
 }
+
+#playground{
+    position: absolute;
+    top:0; left: 0;
+    display: none;
+    }
+#game_stats{
+    position: absolute;
+    top:550px; left: 0;
+    }
+#game_stats div{
+    float:left;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid;
+}
+div.stats_player{
+    clear: left;
+    margin-right: 10px;
+    color: green;
+    border-color: green;
+}
+div.stats_enemy{
+    color: red;
+    border-color: red;
+}
+#game_over{
+    background-color: black;
+    position: absolute;
+    top:150px; left: 0;
+    padding:0;
+    width: 950px;
+    height: 150px;
+    text-align: center;
+    line-height: 150px;
+    font: 40px Impact;
+    font-weight: bold;
+    opacity: 0.7;
+    z-index: 99999;
+    display:none;
+}
+h2.loser{
+    color: red;
+}
+h2.winner{
+    color: green;
+}
+#play_again{
+    color: white;
+}
+#play_again:hover{
+    color: red;
+    cursor: pointer;
+}
+#select_player{
+    background: black url('../img/goldenaxe.png') no-repeat center center;
+    position: absolute;
+    top:0; left: 0;
+    width: 950px;
+    height: 550px;
+}
+#emperor_player{
+    position: absolute;
+    top: 350px; left: 220px;
+    width: 100px;
+}
+#vassal_player{
+    position: absolute;
+    top: 300px; left: 300px;
+    width: 80px;
+}
+#mule_player{
+    position: absolute;
+    top: 300px; left: 160px;
+    width: 80px;
+    /*opacity: 0.4;*/
+}
+#select_player img{
+    border-bottom: 0;
+}
+#select_player img:hover{
+    cursor: pointer;
+    border-bottom: 4px red solid;
+}
+
+div.log{
+    position: fixed;
+	border:1px solid red;
+	width:400px;
+	height:200px;
+	overflow: auto;
+	color: black;
+	opacity: 0.7;
+	background-color: white;
+	line-height: 80%;
+	font-family: Courier;
+	font-size: 15px;
+	letter-spacing: -2px;
+	z-index: 999999;
+}
+#log_0 {top: 0; right: 0;}
+#log_1 {top: 210px; right: 0;}
+#log_2 {top: 420px; right: 0;}
