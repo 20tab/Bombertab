@@ -31,12 +31,13 @@ body{
 #debug_button{
     position: absolute;
     text-align: center;
+    width:50px;
     top:550px; left: 0;
     }
 
 #game_stats{
     position: absolute;
-    top:550px; left: 30px;
+    top:550px; left: 50px;
     border: 1px black solid;
     }
 #game_stats div{

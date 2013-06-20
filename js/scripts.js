@@ -180,7 +180,7 @@ jQuery(function(){
         	imageURL: "img/vassal_die.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
         playerAnimation["v_winner"] = 	new $.gameQuery.Animation({
-        	imageURL: "img/vassal_winner.png", numberOfFrame: 30, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
+        	imageURL: "img/vassal_winner.png", numberOfFrame: 28, delta: 50, rate: 130, type: $.gameQuery.ANIMATION_HORIZONTAL | $.gameQuery.ANIMATION_CALLBACK, offsetx:0, offsety:0
         	});
         	
 		playerAnimation["m_idle"] = 	new $.gameQuery.Animation({
