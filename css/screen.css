@@ -87,6 +87,7 @@ h2.winner{
 }
 #play_again{
     color: white;
+    display: none;
 }
 #play_again:hover{
     color: red;
