@@ -500,7 +500,7 @@ jQuery(function(){
 	$('.choose_player').on('click',function(){
       var username_input = $('#username_input').val();
       if(username_input == ''){
-        $('#username_input').css('border', '2px red solid');
+        $('#username_input').css('border', '5px red solid');
       }else{
         username = username_input;
 	    //$('#startGame').html();

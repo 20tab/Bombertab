@@ -115,9 +115,14 @@ h2.winner{
     width: 80px;
     /*opacity: 0.4;*/
 }
-#username_input{
+#username_div{
+    color: white;
+    text-align: center;
+    font-weight: bold;
     position: absolute;
-    top: 520px; left: 215px;
+    top: 500px; left: 215px;
+}
+#username_input{
     width: 100px;
     background-color:transparent;
     color:white;
