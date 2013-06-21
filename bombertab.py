@@ -278,6 +278,16 @@ class BomberTab(TremoloApp):
     arena_w = arena_block_w * arena_block
     arena_h = arena_block_h * arena_block
     bombs = []
+    commands = {}
+
+    def __init__(self, *args, **kwargs):
+        self.commands['n'] = self.north
+        self.commands['s'] = self.south
+        self.commands['e'] = self.east
+        self.commands['w'] = self.west
+        self.commands['b'] = self.bomb
+        self.commands['0'] = self.stop
+        super(BomberTab, self).__init__(*args, **kwargs) 
 
     def end(self, core_id):
         print "player %d disconnected" % core_id
@@ -322,54 +332,42 @@ class BomberTab(TremoloApp):
             self.players[core_id] = bp
             # join the game
             print "player replay", core_id
-        elif msg['c'] == 'n':
+        else:
             try:
                 bp = self.players[msg['p']] 
+                self.commands[msg['c']](bp, msg)
             except:
-                return
-            bp.recursion = 0
-            bp.move_north()
-        elif msg['c'] == 's':
-            try:
-                bp = self.players[msg['p']] 
-            except:
-                return
-            bp.recursion = 0
-            bp.move_south()
-        elif msg['c'] == 'e':
-            try:
-                bp = self.players[msg['p']] 
-            except:
-                return
-            bp.recursion = 0
-            bp.move_east()
-        elif msg['c'] == 'w':
-            try:
-                bp = self.players[msg['p']] 
-            except:
-                return
-            bp.recursion = 0
-            bp.move_west()
-        elif msg['c'] == 'b':
-            try:
-                bp = self.players[msg['p']] 
-            except:
-                return
-            bp.drop_bomb()
-        elif msg['c'] == 'r':
-            try:
-                bp = self.players[msg['p']] 
-            except:
-                return
-        elif msg['c'] == '0':
-            # broadcast stop
-            try:
-                player = self.players[msg['p']]
-            except:
-                return
-            announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar, 'u':player.name}
-            player.direction = '0'
-            self.broadcast(json.dumps(announce))
+                pass
         #print msg
 
-application = BomberTab()
+    # n
+    def north(self, bp, msg):
+        bp.recursion = 0
+        bp.move_north()
+
+    # s
+    def south(self, bp, msg):
+        bp.recursion = 0
+        bp.move_south()
+
+    # e
+    def east(self, bp, msg):
+        bp.recursion = 0
+        bp.move_east()
+
+    # w
+    def west(self, bp, msg):
+        bp.recursion = 0
+        bp.move_west()
+
+    # b
+    def bomb(self, bp, msg):
+        bp.drop_bomb()
+
+    # 0
+    def stop(self, bp, msg):
+        announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar, 'u':player.name}
+        player.direction = '0'
+        self.broadcast(json.dumps(announce))
+
+application = BomberTab(redis_host='127.0.0.30',redis_port=19759)
