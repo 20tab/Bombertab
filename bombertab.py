@@ -2,9 +2,6 @@ from tremolo import TremoloApp
 import simplejson as json
 import gevent
 
-class BomberSession:
-    pass
-
 bomber_arena = [
    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
    1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,
@@ -33,11 +30,15 @@ def win(player):
         except:
             pass
 
+"""
+this task is execute one time per-bomb
+"""
 def bomb_task(bomb):
     player = bomb.player
     game = bomb.game
     pos = bomb.pos
     detonation_positions = [pos]
+    # on which square the bomb has been dropped ?
     pos_y = pos/game.arena_block_w
     pos_x = pos%game.arena_block_w
     if pos_y > 0:
@@ -48,12 +49,15 @@ def bomb_task(bomb):
         detonation_positions.append(pos-1)
     if pos_x < (game.arena_block_w -1):
         detonation_positions.append(pos+1)
+    # the bomb will detonate in 3 seconds
     gevent.sleep(3)
     print "EXPLODE !!!!"
+    # broadcast of the explosion
     bomb_msg = {'c':'x', 'p':player.id, 'i':bomb.id}
     player.game.broadcast(json.dumps(bomb_msg))
+    # wait a bit (to allow last-time escapes)
     gevent.sleep(0.4)
-    # death check
+    # death check (every dead player will be in this array)
     deaths = []
     for p_id in game.players:
         bp = game.players[p_id]
@@ -63,18 +67,23 @@ def bomb_task(bomb):
             announce = {'c':'k', 'p':bp.id, 'a':bp.avatar, 'u':bp.name}
             bp.x = 0
             bp.y = 0
+            # broadcast the death of a player
             player.game.broadcast(json.dumps(announce))
             deaths.append(bp.id)
+    # remove dead players
     for id in deaths:
         try:
             del(player.game.players[id])
         except:
             pass
-    if len(game.players) == 1:
+    # if at leats one player is dead and only one player is alive, we have a winner...
+    if len(deaths) > 0 and len(game.players) == 1:
         winner = game.players[ game.players.keys()[0] ]
-        print "VITTORIA"
+        print "VICTORY"
         victory = {'c':'v', 'p':winner.id, 'a':winner.avatar, 'u':winner.name}
+        # broadcast the victory
         player.game.broadcast(json.dumps(victory))
+        # cleanup the battlefield
         win(winner)
     gevent.sleep(0.6)
     bomb.destroy()
