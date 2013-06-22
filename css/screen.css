@@ -55,7 +55,7 @@ body{
     border: 1px solid;
 }
 div.stats_player{
-    clear: left;
+    /*clear: left;*/
     margin-right: 10px;
     color: green;
     border-color: green;

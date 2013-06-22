@@ -437,16 +437,17 @@ jQuery(function(){
 	
  	var send_stop = true;
  	
- 	// player over
+ 	// utility functions
  	function anim_player_over(){
  	    $('#game_over h2').removeClass().addClass('loser').html('GAME OVER');
  	    $('#game_over').fadeIn();
+        $('#play_again').fadeIn();
  	}
  	
     $('#play_again').on('click',function(){
-        player_over = false;
         ws.send('{"c":"J", "a":"'+avatar+'", "u":"'+username+'", "p":"'+player_id+'"}');
         write_log('p: '+player_id+' | CURRENT PLAYER JOIN AGAIN','green',2);
+        $('#play_again').fadeOut();
         $('#game_over').fadeOut();
     });
     
