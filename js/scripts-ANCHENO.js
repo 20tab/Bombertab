@@ -55,7 +55,10 @@ jQuery(function(){
 	var EXPLOSION_H = 150;
 	var RATE = 60;
 	
+	var avatar = 'e';
+    var username = '';
 	var player_id = 0;
+	var player_over = false;
 	var game_over = false;
 	var events = Array();
     var players = {};
@@ -63,17 +66,16 @@ jQuery(function(){
 
     /* objects */
 
-    function Bomb(id, posx, posy, owner_id){
+    function Bomb(id, posx, posy, player_id){
         this.id = id;
         this.posx = posx;
         this.posy = posy;
-        this.owner_id = owner_id;
+        this.player_id = player_id;
         self = this;
 
         this.create = function create(){
-            console.log('creando la bomba '+this.id);
             if($("#bomb_"+this.id).get()){
-                write_log('p: '+this.owner_id+' | inizio sequenza drop '+'i: '+this.id,'red');
+                write_log('p: '+this.player_id+' | inizio sequenza drop '+'i: '+this.id,'red');
                 bombSound["drop"].play();
                 $.playground()
                     .addGroup("bomb_"+this.id, {posx: this.posx, posy: this.posy, width: BOMB_W, height: BOMB_H})
@@ -81,31 +83,25 @@ jQuery(function(){
                                 animation: bombAnimation["drop"],
                                 posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, 
                                 callback: function(){
-                                    write_log('p: '+self.owner_id+' | inizio sequenza loop '+'i: '+this.id,'red');
+                                    write_log('p: '+this.player_id+' | inizio sequenza loop '+'i: '+this.id,'red');
                                     bombSound["loop"].play();
-                                    $("#bombBody_"+self.id).setAnimation(bombAnimation["loop"]);
+                                    $("#bombBody_"+this.id).setAnimation(bombAnimation["loop"]);
                                 }
                             });	              
             }
-            console.log('creata la bomba');
         }
 
         this.explode = function explode(){
-            console.log('esplodendo la bomba '+this.id);
-            write_log('p: '+this.owner_id+' | esplode la bomba '+'i: '+this.id,'red'); 
+            write_log('p: '+this.player_id+' | esplode la bomba '+'i: '+this.id,'red'); 
             bombSound["loop"].pause();
             bombSound["explode"].play();       
-            $("#bombBody_"+this.id).setAnimation(bombAnimation["explode"],           	    	
+            $("#bombBody_"+bombid).setAnimation(bombAnimation["explode"],           	    	
                 function(){
-                    write_log('p: '+self.owner_id+' | rimuovendo la bomba '+'i: '+self.id,'red');
-                    $("#bomb_"+self.id).remove();
-                    write_log('p: '+self.owner_id+' | rimossa la bomba '+'i: '+self.id,'red'); 
-                    console.log('ora faccio pull di '+self.id+' da bombs: '+JSON.stringify(bombs));
-                    delete bombs[self.id]; 
-                    console.log('ed ecco bombs: '+JSON.stringify(bombs));
-                    console.log('esplosa la bomba '+self.id);
-                }
-            );
+                    write_log('p: '+self.player_id+' | rimuovendo la bomba '+'i: '+this.id,'red');
+                    $("#bomb_"+this.id).remove();
+                    write_log('p: '+self.player_id+' | rimossa la bomba '+'i: '+this.id,'red');                  
+               }
+            ); 
         }
     }
 
@@ -118,26 +114,23 @@ jQuery(function(){
         this.direction = 'e';
         this.old_direction = 'e'
         this.dead = false;
-        this.player = false;
+        this.player = false
         var self = this;
 
         this.create = function create(){
-            console.log('creating player '+this.id+'/'+this.username);
             $.playground().addGroup("player_"+this.id, {posx: this.posx, posy: this.posy, width: ACTOR_W, height: ACTOR_H})
                  .addSprite("playerBody_"+this.id,{animation: playerAnimation[this.avatar+"_idle"],
                        posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
-            if(!this.player){stats_class = 'stats_enemy';}else{stats_class = 'stats_player';}
-            $('#game_stats').append('<div class="'+stats_class+'" id="stats_p_'+this.id+'"><p>'+this.username+' ('+this.id+')</p></div>');
+            $('#game_stats').append('<div class="stats_enemy" id="stats_p_'+this.id+'"><p>'+this.username+' ('+this.id+')</p></div>');
             $("<div class='username_box'>"+this.username+"</div>").appendTo('#playerBody_'+this.id);
         }
 
-        this.reborn = function reborn(){
+        this.rebord = function reborn(){
             this.dead = false;
         }
 
         this.set_player = function set_player(){
             this.player = true;
-            player_id = this.id;
         }
 
         this.move = function move(new_dir, old_dir, x, y){
@@ -419,10 +412,9 @@ jQuery(function(){
         
         
         // adding players
-        console.log('players in init arena: '+JSON.stringify(players));
+        console.log('players in init arena'+players);
         for(p in players){
-            console.log('\npassando il player: '+JSON.stringify(players[p]));
-            players[p].create();
+            p.create();
         }
 		
         $.playground().registerCallback(eventsManager, RATE);
@@ -455,7 +447,6 @@ jQuery(function(){
 	
 	
 	function eventsManager(){
-        player_over = players[player_id].dead;
 	
 	    if(jQuery.gameQuery.keyTracker[32] && !player_over){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
 			var message = {'c':'b','p':player_id};
@@ -505,34 +496,23 @@ jQuery(function(){
                     players[msg['p']].move(msg['d'], msg['o'], msg['x'], msg['y']);        
 			    	break;
 			    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
-                    try{
-                        new_player = players[msg['p']];
-                        if(new_player.dead){
-                            console.log('dentro all if dead');
-                            new_player.reborn();
-                            new_player.create();
-                        }
-                        //else is not possible here
-                    }catch(err){
-                        //if(err=='ReferenceError' || err=='TypeError'){
-                            
-                            players[msg['p']] = new Player(msg['p'],msg['u'],msg['a'],msg['x'],msg['y']);
-                            players[msg['p']].create();
-                        //}
+                    new player = players['p'];
+                    console.log('PLAYER: '+player);
+                    if (player == undefined){
+			    	    players[msg['p']] = new Player(msg['p'],msg['u'],msg['a'],msg['x'],msg['y']);
+                        players[msg['p']].create();
+                    }else if(player.dead){
+                        player.reborn();
+                        player.create();
                     }
 	                break;
                 case "k": // k=kill (rimuovi player_id 'p')
                     players[msg['p']].die();
         	        break;
         	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-                    console.log('eseguo DROP sulla bomba: '+msg['i']);
-                    console.log('array bombe prima: '+JSON.stringify(bombs));
                     players[msg['p']].drop_bomb(msg['i'],msg['x'],msg['y']);
-                    console.log('array bombe dopo: '+JSON.stringify(bombs));
                     break;
                 case "x": // x=explosion (esplode la bomba)
-                    console.log('eseguo ESPLODI sulla bomba: '+msg['i']);
-                    console.log('array bombe: '+JSON.stringify(bombs));
                     bombs[msg['i']].explode();
         	    	break;
         	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
@@ -573,13 +553,17 @@ jQuery(function(){
 			    write_log('received msg: '+JSON.stringify(msg_in),'black',1);
 				    switch(msg_in['c']){  // controllo quale comando viene passato
 				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
+                            console.log('players prima: '+players);
 			    	        players[msg_in['p']] = new Player(msg_in['p'],msg_in['u'],msg_in['a'],msg_in['x'],msg_in['y']);
 				            players[msg_in['p']].set_player();
+                            console.log('players dopo di me: '+players);
+                            console.log('io'+players[msg_in['p']]);
 				            $.playground().clearAll(true);
                             enemies = msg_in['e'];
                             for(i in enemies){
                                 players[enemies[i][0]] = new Player(enemies[i][0],enemies[i][4],enemies[i][1],enemies[i][2],enemies[i][3]);
                             }
+                            console.log('players dopo nemici: '+players);
 				            init_arena();
 				            $("#grid").html(arena(msg_in['b']));
 				            break;
