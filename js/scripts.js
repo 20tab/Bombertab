@@ -7,6 +7,7 @@
 
 
 /*
+
     IN
         e enemies-list [[p,a,x,y],[...]..]
         b arena-block-list [0,1,0,1,0,1,0...]
@@ -42,6 +43,7 @@
             n move north
             s move south
             0 stop
+
 */
 
 
