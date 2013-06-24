@@ -69,6 +69,7 @@ jQuery(function(){
     var players = {};
     var bombs = {};
 
+
     /* objects */
 
     function Bomb(id, posx, posy, owner_id){
@@ -437,32 +438,42 @@ jQuery(function(){
 	
 	    if(jQuery.gameQuery.keyTracker[32] && !player_over){ //this is bomb! (space) bomb is out of 'if' cause you can drop it while moving
 			var message = {'c':'b','p':player_id};
-			send_stop = true;
+		    ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+	        send_stop = true;
 		}
 	
 		if((jQuery.gameQuery.keyTracker[65] || jQuery.gameQuery.keyTracker[37]) && !player_over){ //this is left! (a or arrow-left)
 			var message = {'c':'w','p':player_id};
-			send_stop = true;
+			ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+            send_stop = true;
     	}
 		else if((jQuery.gameQuery.keyTracker[87] || jQuery.gameQuery.keyTracker[38]) && !player_over){ //this is up! (w or arrow-up)
 			var message = {'c':'n','p':player_id};
-			send_stop = true;
+			ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+            send_stop = true;
 		}
     	else if((jQuery.gameQuery.keyTracker[68] || jQuery.gameQuery.keyTracker[39]) && !player_over){ //this is right! (d or arrow-right)
 			var message = {'c':'e','p':player_id};
-			send_stop = true;
+			ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+            send_stop = true;
 		}
 		else if((jQuery.gameQuery.keyTracker[83] || jQuery.gameQuery.keyTracker[40]) && !player_over){ //this is down! (s or arrow-down)
 			var message = {'c':'s','p':player_id};
-			send_stop = true;
+			ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+            send_stop = true;
 		}
 		else if(send_stop){
 		    var message = {'c':'0','p':player_id};
-		    send_stop = false;
+		    ws.send(JSON.stringify(message));
+		    write_log('send msg: '+JSON.stringify(message),'black',2);
+            send_stop = false;
 		}
-		ws.send(JSON.stringify(message));
-		write_log('send msg: '+JSON.stringify(message),'black',2);
-
+		
 		while((msg_queue = events.pop()) != null){ 
 	        var msg = msg_queue;
 	        write_log('c: '+msg['c']+' - p: '+msg['p']+'/'+msg['a']+' | msg processed','green');  
