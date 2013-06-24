@@ -47,6 +47,7 @@
 
 jQuery(function(){
     var	SOCKET_ADDRESS = "ws://bombertab.20tab.com/tremolo";
+	var RATE = 60;
 
 	var BORDER_CELL = 0;
 	var CELLS_NUMBER_W = 19;
@@ -61,7 +62,6 @@ jQuery(function(){
 	var BOMB_H = 150;
 	var EXPLOSION_W = 150;
 	var EXPLOSION_H = 150;
-	var RATE = 60;
 	
 	var player_id = 0;
 	var game_over = false;
@@ -94,7 +94,6 @@ jQuery(function(){
                                 }
                             });	              
             }
-            console.log('creata la bomba');
         }
 
         this.explode = function explode(){
@@ -125,7 +124,6 @@ jQuery(function(){
         var that = this;
 
         this.create = function create(){
-            console.log('creating player '+this.id+'/'+this.username);
             $.playground().addGroup("player_"+this.id, {posx: this.posx, posy: this.posy, width: ACTOR_W, height: ACTOR_H})
                  .addSprite("playerBody_"+this.id,{animation: playerAnimation[this.avatar+"_idle"],
                        posx: 0, posy: 0, width: ACTOR_W, height: ACTOR_H});
@@ -202,11 +200,9 @@ jQuery(function(){
         }
 
         this.die = function die(){
-            console.log(this.username + ' dying');
             this.dead = true;
             playerSound["die"].play();
             write_log('p: '+this.id+' | dying','red');
-            console.log('parte animazion di morte');
             $("#playerBody_"+this.id).setAnimation(
                 playerAnimation[this.avatar+"_die"],
                 function(){
@@ -402,9 +398,7 @@ jQuery(function(){
         
         
         // adding players
-        console.log('players in init arena: '+JSON.stringify(players));
         for(p in players){
-            console.log('\npassando il player: '+JSON.stringify(players[p]));
             players[p].create();
         }
 		
