@@ -375,8 +375,8 @@ class BomberTab(TremoloApp):
 
     # 0
     def stop(self, bp, msg):
-        announce = {'c':'0', 'p':player.id, 'd':player.direction, 'a':player.avatar, 'u':player.name}
-        player.direction = '0'
+        announce = {'c':'0', 'p':bp.id, 'd':bp.direction, 'a':bp.avatar, 'u':bp.name}
+        bp.direction = '0'
         self.broadcast(json.dumps(announce))
 
 application = BomberTab(redis_host='127.0.0.30',redis_port=19759)
