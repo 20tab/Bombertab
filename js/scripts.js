@@ -135,6 +135,8 @@ jQuery(function(){
         }
 
         this.reborn = function reborn(){
+            this.posx = 0;
+            this.posy = 0;  
             this.dead = false;
         }
 
@@ -439,88 +441,70 @@ jQuery(function(){
 	function eventsManager(){
         player_over = players[player_id].dead;
 	
-	    if(jQuery.gameQuery.keyTracker[32] && !player_over){ //this is bomb! (space) la bomba e' fuori dagli else if dei movimenti perche' devi poterla lasciare mentre ti muovi
+	    if(jQuery.gameQuery.keyTracker[32] && !player_over){ //this is bomb! (space) bomb is out of 'if' cause you can drop it while moving
 			var message = {'c':'b','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 	
 		if((jQuery.gameQuery.keyTracker[65] || jQuery.gameQuery.keyTracker[37]) && !player_over){ //this is left! (a or arrow-left)
 			var message = {'c':'w','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
     	}
 		else if((jQuery.gameQuery.keyTracker[87] || jQuery.gameQuery.keyTracker[38]) && !player_over){ //this is up! (w or arrow-up)
 			var message = {'c':'n','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
     	else if((jQuery.gameQuery.keyTracker[68] || jQuery.gameQuery.keyTracker[39]) && !player_over){ //this is right! (d or arrow-right)
 			var message = {'c':'e','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 		else if((jQuery.gameQuery.keyTracker[83] || jQuery.gameQuery.keyTracker[40]) && !player_over){ //this is down! (s or arrow-down)
 			var message = {'c':'s','p':player_id};
-			ws.send(JSON.stringify(message));
-			write_log('send msg: '+JSON.stringify(message),'black',2);
 			send_stop = true;
 		}
 		else if(send_stop){
 		    var message = {'c':'0','p':player_id};
-		    ws.send(JSON.stringify(message));
-		    write_log('send msg: '+JSON.stringify(message),'black',2);
 		    send_stop = false;
 		}
-		
-		while((msg_queue = events.pop()) != null){  //in events c'e' una lista di eventi e con 3 elementi: [0]=id_giocatore, [1]=x_giocatore, [2]=y_giocatore [3]=n,s,w,e direzione omino, [4]=n,s,w,e direzione precedente
-		
+		ws.send(JSON.stringify(message));
+		write_log('send msg: '+JSON.stringify(message),'black',2);
+
+		while((msg_queue = events.pop()) != null){ 
 	        var msg = msg_queue;
 	        write_log('c: '+msg['c']+' - p: '+msg['p']+'/'+msg['a']+' | msg processed','green');  
             
-			switch(msg['c']){  // controllo quale comando viene passato
-			    case "m": // m=move (muovi il player_id 'p' alle coordinate x y con direzione d)
+			switch(msg['c']){  // checking command 
+			    case "m": // m=move (move player p in direction d from old direction o at coord x and y)
                     players[msg['p']].move(msg['d'], msg['o'], msg['x'], msg['y']);        
 			    	break;
-			    case "p": // p=add_player (aggiungo player_id 'p' alla posizione x y con direzione d)
+			    case "p": // p=add_player (add player p with username u and avatar a at coord x and y)
                     try{
                         new_player = players[msg['p']];
                         if(new_player.dead){
-                            console.log('dentro all if dead');
                             new_player.reborn();
                             new_player.create();
                         }
                         //else is not possible here
                     }catch(err){
                         //if(err=='ReferenceError' || err=='TypeError'){
-                            
                             players[msg['p']] = new Player(msg['p'],msg['u'],msg['a'],msg['x'],msg['y']);
                             players[msg['p']].create();
                         //}
                     }
 	                break;
-                case "k": // k=kill (rimuovi player_id 'p')
+                case "k": // k=kill (remove player 'p')
                     players[msg['p']].die();
         	        break;
-        	    case "b": // b=bomb (disegna bombbody_id 'p' alle coordinate x y del player )
-                    console.log('eseguo DROP sulla bomba: '+msg['i']);
-                    console.log('array bombe prima: '+JSON.stringify(bombs));
+        	    case "b": // b=bomb (drop bomb i at player p coord x and y)
                     players[msg['p']].drop_bomb(msg['i'],msg['x'],msg['y']);
-                    console.log('array bombe dopo: '+JSON.stringify(bombs));
                     break;
-                case "x": // x=explosion (esplode la bomba)
-                    console.log('eseguo ESPLODI sulla bomba: '+msg['i']);
-                    console.log('array bombe: '+JSON.stringify(bombs));
+                case "x": // x=explosion (explode bomb i)
                     bombs[msg['i']].explode();
         	    	break;
-        	    case "0": // 0=stop (omino p fermo in x y con direzione 0)
+        	    case "0": // 0=stop (player p stops in direction d)
                     players[msg['p']].stop(msg['d']);
         	    	break;
-        	    case "v": // v=vittoria (vince il player p)
+        	    case "v": // v=win (player p wins))
 			        player[msg['p']].win();
 			    	break;
 			    default:
@@ -529,7 +513,6 @@ jQuery(function(){
 		}
 	}
 	
-
 	
 	$('.choose_player').on('click',function(){
       var username_input = $('#username_input').val();
@@ -547,16 +530,16 @@ jQuery(function(){
 		$.playground().startGame(function(){
 			ws = new WebSocket(SOCKET_ADDRESS);
 			ws.onopen = function() {
-			        ws.send('{"c":"j", "a":"'+avatar+'", "u":"'+username+'"}');   //c=comando  j=join (chiedo al server di entrare)  a=avatar e(mperor) v(assal) m(ule)
+			        ws.send('{"c":"j", "a":"'+avatar+'", "u":"'+username+'"}');   //c=command  j=join (ask server to join)  a=avatar e(mperor) v(assal) m(ule)
 			};
 			
-			ws.onmessage = function(evt) {   //quando il websocket riceve un messaggio
+			ws.onmessage = function(evt) {   // when websocket receives a message
 			    var msg_in = jQuery.parseJSON(evt.data);
 			    write_log('received msg: '+JSON.stringify(msg_in),'black',1);
-				    switch(msg_in['c']){  // controllo quale comando viene passato
-				        case "z": // z=benvenuto (il server ti ha accettato, ti passo p=player_id, x=tua_posiziona_x, y=tua_posizione_y, e=lista_nemici, b=lista di blocchi dell'arena) 
+				    switch(msg_in['c']){  // checking the received command
+				        case "z": // z=welcome (server accepted you, send p=player_id, x=x_coord, y=y_coord, e=enemies list, b=arena_block_list) 
 			    	        players[msg_in['p']] = new Player(msg_in['p'],msg_in['u'],msg_in['a'],msg_in['x'],msg_in['y']);
-				            players[msg_in['p']].set_player();
+				            players[msg_in['p']].set_player(); // set the current player is me
 				            $.playground().clearAll(true);
                             enemies = msg_in['e'];
                             for(i in enemies){
@@ -565,8 +548,7 @@ jQuery(function(){
 				            init_arena();
 				            $("#grid").html(arena(msg_in['b']));
 				            break;
-				        default: // tutti gli altri li accodi
-				        	//events.push([msg['p'],msg['x'],msg['y'],msg['d'],msg['o']]);
+				        default: // all the other commands will be queued
 				        	events.push(msg_in);
 				        	break;
 				    }
