@@ -1,4 +1,12 @@
 /*
+ ** Developer : 20tab srl (www.20tab.com) 
+ ** Date : 20 june 2013
+ ** All code (c)2013 20tab srl
+*/
+
+
+
+/*
     IN
         e enemies-list [[p,a,x,y],[...]..]
         b arena-block-list [0,1,0,1,0,1,0...]
@@ -68,10 +76,9 @@ jQuery(function(){
         this.posx = posx;
         this.posy = posy;
         this.owner_id = owner_id;
-        self = this;
+        var that = this;
 
         this.create = function create(){
-            console.log('creando la bomba '+this.id);
             if($("#bomb_"+this.id).get()){
                 write_log('p: '+this.owner_id+' | inizio sequenza drop '+'i: '+this.id,'red');
                 bombSound["drop"].play();
@@ -81,9 +88,9 @@ jQuery(function(){
                                 animation: bombAnimation["drop"],
                                 posx: -50, posy: -50, width: BOMB_W, height: BOMB_H, 
                                 callback: function(){
-                                    write_log('p: '+self.owner_id+' | inizio sequenza loop '+'i: '+this.id,'red');
+                                    write_log('p: '+that.owner_id+' | inizio sequenza loop '+'i: '+that.id,'red');
                                     bombSound["loop"].play();
-                                    $("#bombBody_"+self.id).setAnimation(bombAnimation["loop"]);
+                                    $("#bombBody_"+that.id).setAnimation(bombAnimation["loop"]);
                                 }
                             });	              
             }
@@ -91,19 +98,15 @@ jQuery(function(){
         }
 
         this.explode = function explode(){
-            console.log('esplodendo la bomba '+this.id);
             write_log('p: '+this.owner_id+' | esplode la bomba '+'i: '+this.id,'red'); 
             bombSound["loop"].pause();
             bombSound["explode"].play();       
             $("#bombBody_"+this.id).setAnimation(bombAnimation["explode"],           	    	
                 function(){
-                    write_log('p: '+self.owner_id+' | rimuovendo la bomba '+'i: '+self.id,'red');
-                    $("#bomb_"+self.id).remove();
-                    write_log('p: '+self.owner_id+' | rimossa la bomba '+'i: '+self.id,'red'); 
-                    console.log('ora faccio pull di '+self.id+' da bombs: '+JSON.stringify(bombs));
-                    delete bombs[self.id]; 
-                    console.log('ed ecco bombs: '+JSON.stringify(bombs));
-                    console.log('esplosa la bomba '+self.id);
+                    write_log('p: '+that.owner_id+' | rimuovendo la bomba '+'i: '+that.id,'red');
+                    $("#bomb_"+that.id).remove();
+                    write_log('p: '+that.owner_id+' | rimossa la bomba '+'i: '+that.id,'red'); 
+                    delete bombs[that.id]; 
                 }
             );
         }
@@ -119,7 +122,7 @@ jQuery(function(){
         this.old_direction = 'e'
         this.dead = false;
         this.player = false;
-        var self = this;
+        var that = this;
 
         this.create = function create(){
             console.log('creating player '+this.id+'/'+this.username);
@@ -148,20 +151,7 @@ jQuery(function(){
             write_log('p: '+this.id+'/'+this.avatar+' | d: '+new_dir+" - o: "+old_dir);
             if(new_dir != old_dir){   //changing direction compared to previous frame
                 write_log('p: '+this.id+'/'+this.avatar+' | cambio dir','orange');
-                switch(new_dir){ //checking new direction and setting new animation
-                    case "n": //north
-                        $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_up"]);
-                        break;
-                    case "s": //south
-                        $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_down"]);
-                        break;
-                    case "w": //west
-                        $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_left"]);
-                        break;
-                    case "e": //east
-                        $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_right"]);
-                        break;
-                }
+                $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_"+new_dir]);
             }
             //in any case I have to move the player to the new coord
             $("#player_"+this.id).css("left", x+"px");
@@ -171,17 +161,8 @@ jQuery(function(){
         this.stop = function stop(direction){
             write_log('p: '+this.id+'/'+this.avatar+' | idle','blue');
             switch(direction){  // controllo quale direzione viene passata
-                case "n":
-                    $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle-n"]);
-                    break;
-                case "e":
-                    $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle-e"]);
-                    break;
-                case "s":
-                    $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle-s"]);
-                    break;
-                case "w":
-                    $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle-w"]);
+                case "n" || "e" || "s" || "w":
+                    $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle-"+direction]);
                     break;
                 default:
                     $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_idle"]);
@@ -206,12 +187,12 @@ jQuery(function(){
             $("#playerBody_"+this.id).setAnimation(playerAnimation[this.avatar+"_winner"],           	    	
                 function(){
                     //$.playground().pauseGame();
-                    write_log('p: '+self.id+' | FINE GIOCO ','red');  
-                    write_log('p: '+self.id+' | rimuovendo dopo vittoria','red');
-                    $("#player_"+self.id).remove();
-                    $("#stats_p_"+self.id).remove();
-                    write_log('p: '+self.id+' | vincitore rimosso','red');
-                    if(self.player){
+                    write_log('p: '+that.id+' | FINE GIOCO ','red');  
+                    write_log('p: '+that.id+' | rimuovendo dopo vittoria','red');
+                    $("#player_"+that.id).remove();
+                    $("#stats_p_"+that.id).remove();
+                    write_log('p: '+that.id+' | vincitore rimosso','red');
+                    if(that.player){
                         $('#play_again').fadeIn();
                     }
                 }
@@ -227,14 +208,14 @@ jQuery(function(){
             $("#playerBody_"+this.id).setAnimation(
                 playerAnimation[this.avatar+"_die"],
                 function(){
-                    write_log('p: '+self.id+' | removing','red');
-                    $("#player_"+self.id).remove();
-                    $("#stats_p_"+self.id).remove();
-                    write_log('p: '+self.id+' | dead and removed','red');
-                    if(self.id == player_id){  //player_over
+                    write_log('p: '+that.id+' | removing','red');
+                    $("#player_"+that.id).remove();
+                    $("#stats_p_"+that.id).remove();
+                    write_log('p: '+that.id+' | dead and removed','red');
+                    if(that.id == player_id){  //player_over
                         player_over = true;
                         anim_player_over();
-                        write_log('p: '+self.id+' | CURRENT PLAYER GAME OVER','red');
+                        write_log('p: '+that.id+' | CURRENT PLAYER GAME OVER','red');
                     }
                 }
             ); // /setAnimation
@@ -303,25 +284,25 @@ jQuery(function(){
 		playerAnimation["e_idle"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["e_right"]      = new $.gameQuery.Animation({
+	    playerAnimation["e_e"]      = new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
         playerAnimation["e_idle-e"]      = new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["e_left"] =	new $.gameQuery.Animation({
+	    playerAnimation["e_w"] =	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
         playerAnimation["e_idle-w"] =	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
-	    playerAnimation["e_up"] = 	new $.gameQuery.Animation({
+	    playerAnimation["e_n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
         playerAnimation["e_idle-n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-	    playerAnimation["e_down"] = 	new $.gameQuery.Animation({
+	    playerAnimation["e_s"] = 	new $.gameQuery.Animation({
         	imageURL: "img/emperor.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
         playerAnimation["e_idle-s"] = 	new $.gameQuery.Animation({
@@ -337,25 +318,25 @@ jQuery(function(){
 		playerAnimation["v_idle"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["v_right"]      = new $.gameQuery.Animation({
+	    playerAnimation["v_e"]      = new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
         playerAnimation["v_idle-e"]      = new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["v_left"] =	new $.gameQuery.Animation({
+	    playerAnimation["v_w"] =	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
         playerAnimation["v_idle-w"] =	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
-	    playerAnimation["v_up"] = 	new $.gameQuery.Animation({
+	    playerAnimation["v_n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
         playerAnimation["v_idle-n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-	    playerAnimation["v_down"] = 	new $.gameQuery.Animation({
+	    playerAnimation["v_s"] = 	new $.gameQuery.Animation({
         	imageURL: "img/vassal.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
         playerAnimation["v_idle-s"] = 	new $.gameQuery.Animation({
@@ -371,25 +352,25 @@ jQuery(function(){
 		playerAnimation["m_idle"] = 	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["m_right"]      = new $.gameQuery.Animation({
+	    playerAnimation["m_e"]      = new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
         playerAnimation["m_idle-e"]      = new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:75
         	});
-	    playerAnimation["m_left"] =	new $.gameQuery.Animation({
+	    playerAnimation["m_w"] =	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
         playerAnimation["m_idle-w"] =	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:225
         	});
-	    playerAnimation["m_up"] = 	new $.gameQuery.Animation({
+	    playerAnimation["m_n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
         playerAnimation["m_idle-n"] = 	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 1, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:0
         	});
-	    playerAnimation["m_down"] = 	new $.gameQuery.Animation({
+	    playerAnimation["m_s"] = 	new $.gameQuery.Animation({
         	imageURL: "img/mule.png", numberOfFrame: 2, delta: 50, rate: 250, type: $.gameQuery.ANIMATION_HORIZONTAL, offsetx:0, offsety:150
         	});
         playerAnimation["m_idle-s"] = 	new $.gameQuery.Animation({
