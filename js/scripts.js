@@ -48,7 +48,7 @@
 
 
 jQuery(function(){
-    var	SOCKET_ADDRESS = "ws://bombertab.20tab.com/tremolo";
+    var	SOCKET_ADDRESS = "ws://10.30.31.123:9090/tremolo";
 	var RATE = 60;
 
 	var BORDER_CELL = 0;

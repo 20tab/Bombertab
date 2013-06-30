@@ -379,4 +379,4 @@ class BomberTab(TremoloApp):
         bp.direction = '0'
         self.broadcast(json.dumps(announce))
 
-application = BomberTab(redis_host='127.0.0.30',redis_port=19759)
+application = BomberTab(redis_host='127.0.0.1',redis_port=6379)
