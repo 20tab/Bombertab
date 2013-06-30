@@ -512,7 +512,7 @@ jQuery(function(){
                     players[msg['p']].stop(msg['d']);
         	    	break;
         	    case "v": // v=win (player p wins))
-			        player[msg['p']].win();
+			        players[msg['p']].win();
 			    	break;
 			    default:
 			    	break;
