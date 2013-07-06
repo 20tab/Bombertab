@@ -1,5 +1,0 @@
-comunque da ssh (da dentro Bombertab)
-lancia 11:46
-LD_LIBRARY_PATH="/opt/unbit/libevent2018/lib/" ./venv/bin/python bombertab.py 11:46
-cosi' fai partire tremolo 11:46
-e ti vedi il debug in tempo reale
